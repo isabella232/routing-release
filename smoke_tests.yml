@@ -1,0 +1,15 @@
+- type: replace
+  path: /instance_groups/-
+  value:
+    routing_smoke_tests:
+        tcp_apps_domain: tcp.batman.cf-app.com
+        api: api.batman.cf-app.com
+        admin_user: admin
+        admin_password: y092vwz8rke63rmlkkwg
+        apps_domain: batman.cf-app.com
+        artifacts_directory: logs
+        skip_ssl_validation: true
+        use_http: true
+        backend: diego
+        include_route_services: true
+        include_routing: true

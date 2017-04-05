@@ -1,0 +1,24 @@
+- type: replace
+  path: /instance_groups/name=tcp-router/jobs/name=metron_agent/properties/syslog_daemon_config
+  value:
+    address: 10.0.63.198
+    port: 2514
+    transport: relp
+- type: replace
+  path: /instance_groups/name=tcp-emitter/jobs/name=metron_agent/properties/syslog_daemon_config
+  value:
+    address: 10.0.63.198
+    port: 2514
+    transport: relp
+- type: replace
+  path: /instance_groups/name=router/jobs/name=metron_agent/properties/syslog_daemon_config?
+  value:
+    address: 10.0.63.198
+    port: 2514
+    transport: relp
+- type: replace
+  path: /instance_groups/name=api/jobs/name=metron_agent/properties/syslog_daemon_config?
+  value:
+    address: 10.0.63.198
+    port: 2514
+    transport: relp
