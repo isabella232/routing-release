@@ -34,7 +34,7 @@
       locket:
         sql:
           db_host: sql-db.service.cf.internal
-          db_port: 33306
+          db_port: 3306
           db_schema: diego
           db_username: diego
           db_password: "((diego_database_password))"
