@@ -34,11 +34,11 @@
       locket:
         sql:
           db_host: sql-db.service.cf.internal
-          db_port: 5524
+          db_port: 33306
           db_schema: diego
           db_username: diego
           db_password: "((diego_database_password))"
-          db_driver: postgres
+          db_driver: mysql
 - type: replace
   path: /variables/-
   value:
