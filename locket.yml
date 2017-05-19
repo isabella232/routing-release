@@ -46,12 +46,12 @@
     type: certificate
     options:
       ca: service_cf_internal_ca
-      common_name: locket.service.cf.internal
+      common_name: "locket.service.cf.internal"
       extended_key_usage:
       - server_auth
       alternative_names:
       - "*.locket.service.cf.internal"
-      - locket.service.cf.internal
+      - "locket.service.cf.internal"
 - type: replace
   path: /variables/-
   value:
