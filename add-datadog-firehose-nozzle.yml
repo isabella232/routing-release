@@ -8,6 +8,7 @@
     secret: "((uaa_clients_datadog-firehose-nozzle_secret))"
     scope: openid,oauth.approvals,doppler.firehose
     authorities: oauth.login,doppler.firehose
+    redirect-uri: "https://uaa.((system_domain))/login"
 
 
 - type: replace
@@ -29,7 +30,7 @@
         loggregator:
           traffic_controller_url: "wss://doppler.batman.cf-app.com:443"
         datadog:
-          api_key: 2e59b8dfb3bb744e4c7377d7ba01cf58 
+          api_key: 2e59b8dfb3bb744e4c7377d7ba01cf58
           flush_duration_seconds: 15
           metric_prefix: "batman."
         uaa:
