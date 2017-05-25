@@ -3,12 +3,11 @@
   path: /instance_groups/name=uaa/jobs/name=uaa/properties/uaa/clients/datadog-firehose-nozzle?
   value:
     access-token-validity: 1209600
-    authorized-grant-types: authorization_code,client_credentials,refresh_token
+    authorized-grant-types: client_credentials,refresh_token
     override: true
     secret: "((uaa_clients_datadog-firehose-nozzle_secret))"
     scope: openid,oauth.approvals,doppler.firehose
     authorities: oauth.login,doppler.firehose
-    redirect-uri: "https://uaa.((system_domain))/login"
 
 
 - type: replace
@@ -34,7 +33,7 @@
           flush_duration_seconds: 15
           metric_prefix: "batman."
         uaa:
-          url: "https://uaa.batman.cf-app.com"
+          url: "https://uaa.((system_domain))"
           client: "datadog-firehose-nozzle"
           client_secret: "((uaa_clients_datadog-firehose-nozzle_secret))"
         nozzle:
