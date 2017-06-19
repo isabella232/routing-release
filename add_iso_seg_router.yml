@@ -7,7 +7,7 @@
     instances: 1
     vm_type: m3.medium
     vm_extensions:
-    - cf-router-network-properties
+    - cf-iso-router-network-properties
     stemcell: default
     update:
       max_in_flight: 1
