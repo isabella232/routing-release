@@ -1,0 +1,10 @@
+- type: replace
+  path: /instance_groups/name=router/jobs/name=gorouter/properties/router/tls_pem?
+  value:
+    - "((router_ssl.certificate))((router_ssl.private_key))"
+
+- type: remove
+  path: /instance_groups/name=router/jobs/name=gorouter/properties/router/ssl_cert?
+
+- type: remove
+  path: /instance_groups/name=router/jobs/name=gorouter/properties/router/ssl_key?
