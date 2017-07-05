@@ -2,14 +2,6 @@
   path: /instance_groups/name=router/jobs/name=gorouter/properties/router/tls_pem?
   value:
     - |
-      -----BEGIN EC PARAMETERS-----
-      BggqhkjOPQMBBw==
-      -----END EC PARAMETERS-----
-      -----BEGIN EC PRIVATE KEY-----
-      MHcCAQEEIBNI4oD5U7m+rqmv5MgKGsoVREYFgJwQODQ0hE1pEIv8oAoGCCqGSM49
-      AwEHoUQDQgAE7f43D0X/CK7PRzdd6IFRWxKmBf9OF1QPZ3pzHvcWjTYBpb/Df8GN
-      Hqv1duBf+EnecXWC9OFhFv5wW4Cv1X2Olw==
-      -----END EC PRIVATE KEY-----
       -----BEGIN CERTIFICATE-----
       MIICKDCCAc6gAwIBAgIJAIu/8ran/yiMMAkGByqGSM49BAEwRTELMAkGA1UEBhMC
       VVMxEzARBgNVBAgTClNvbWUtU3RhdGUxITAfBgNVBAoTGEludGVybmV0IFdpZGdp
@@ -24,6 +16,14 @@
       AQNJADBGAiEArB11F5JfEUSebvq3Cbr45j8z8zfJyBwV4VqN9FEsM6gCIQC7f65z
       9QJajpL/d4QuVuUFYdgG6wQOcQJdoO/rXzpwYA==
       -----END CERTIFICATE-----
+      -----BEGIN EC PARAMETERS-----
+      BggqhkjOPQMBBw==
+      -----END EC PARAMETERS-----
+      -----BEGIN EC PRIVATE KEY-----
+      MHcCAQEEIBNI4oD5U7m+rqmv5MgKGsoVREYFgJwQODQ0hE1pEIv8oAoGCCqGSM49
+      AwEHoUQDQgAE7f43D0X/CK7PRzdd6IFRWxKmBf9OF1QPZ3pzHvcWjTYBpb/Df8GN
+      Hqv1duBf+EnecXWC9OFhFv5wW4Cv1X2Olw==
+      -----END EC PRIVATE KEY-----
 - type: remove
   path: /instance_groups/name=router/jobs/name=gorouter/properties/router/ssl_cert?
 - type: remove
