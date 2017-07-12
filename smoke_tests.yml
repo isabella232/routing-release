@@ -1,18 +1,18 @@
 - type: replace
-  path: /instance_groups/name=smoke_tests/properties/smoke_tests/isolation_segment_name?
+  path: /instance_groups/name=smoke-tests/properties/smoke_tests/isolation_segment_name?
   value: is1
 - type: replace
-  path: /instance_groups/name=smoke_tests/properties/smoke_tests/isolation_segment_domain?
+  path: /instance_groups/name=smoke-tests/properties/smoke_tests/isolation_segment_domain?
   value: is1.batman.cf-app.com
 - type: replace
-  path: /instance_groups/name=smoke_tests/properties/smoke_tests/enable_isolation_segment_tests?
+  path: /instance_groups/name=smoke-tests/properties/smoke_tests/enable_isolation_segment_tests?
   value: true
 - type: replace
-  path: /instance_groups/name=smoke_tests/properties/smoke_tests/enable_etcd_cluster_check_tests?
+  path: /instance_groups/name=smoke-tests/properties/smoke_tests/enable_etcd_cluster_check_tests?
   value: false
 - type: replace
-  path: /instance_groups/name=smoke_tests/properties/smoke_tests/enable_windows_tests?
+  path: /instance_groups/name=smoke-tests/properties/smoke_tests/enable_windows_tests?
   value: false
 - type: replace
-  path: /instance_groups/name=smoke_tests/properties/smoke_tests/backend?
+  path: /instance_groups/name=smoke-tests/properties/smoke_tests/backend?
   value: diego
