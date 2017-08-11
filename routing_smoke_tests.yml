@@ -12,20 +12,20 @@
     - name: private
     jobs:
     - name: smoke_tests
-    release: routing
-    properties:
-      tcp_emitter:
-        oauth_secret: "((uaa_clients_tcp_emitter_secret))"
-      acceptance_tests:
-        default_timeout: 120
-        tcp_router_group: default-tcp
-        addresses: [tcp.batman.cf-app.com]
-        tcp_apps_domain: tcp.batman.cf-app.com
-        cloud_controller:
-          api: api.batman.cf-app.com
-          admin_user: admin
-          admin_password: "((cf_admin_password))"
-          apps_domain: batman.cf-app.com
-          use_http: true
-        system_domain: batman.cf-app.com
-        skip_ssl_validation: true
+      release: routing
+      properties:
+        tcp_emitter:
+          oauth_secret: "((uaa_clients_tcp_emitter_secret))"
+        acceptance_tests:
+          default_timeout: 120
+          tcp_router_group: default-tcp
+          addresses: [tcp.batman.cf-app.com]
+          tcp_apps_domain: tcp.batman.cf-app.com
+          cloud_controller:
+            api: api.batman.cf-app.com
+            admin_user: admin
+            admin_password: "((cf_admin_password))"
+            apps_domain: batman.cf-app.com
+            use_http: true
+          system_domain: batman.cf-app.com
+          skip_ssl_validation: true
