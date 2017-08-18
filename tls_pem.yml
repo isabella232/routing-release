@@ -16,7 +16,7 @@
         AQNJADBGAiEArB11F5JfEUSebvq3Cbr45j8z8zfJyBwV4VqN9FEsM6gCIQC7f65z
         9QJajpL/d4QuVuUFYdgG6wQOcQJdoO/rXzpwYA==
         -----END CERTIFICATE-----
-      private_key:
+      private_key: |
         -----BEGIN EC PARAMETERS-----
         BggqhkjOPQMBBw==
         -----END EC PARAMETERS-----
