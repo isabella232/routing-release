@@ -1,5 +1,5 @@
 - type: replace
-  path: /instance_groups/name=tcp-router/jobs/name=metron_agent/properties/syslog_daemon_config
+  path: /instance_groups/name=tcp-router/jobs/name=metron_agent/properties/syslog_daemon_config?
   value:
     address: 10.0.63.198
     port: 2514
