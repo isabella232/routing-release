@@ -3,5 +3,5 @@
   value: false
 
 - type: replace
-  path: /instance_groups/name=smoke-tests/jobs/name=smoke_tests/properties/ssl_skip_validation?
+  path: /instance_groups/name=smoke-tests/jobs/name=smoke_tests/properties/skip_ssl_validation?
   value: false
