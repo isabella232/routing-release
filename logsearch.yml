@@ -12,9 +12,10 @@
     name: syslog_forwarder
     release: syslog
     properties:
-      address: 10.0.63.198
-      port: 2514
-      transport: relp
+      syslog:
+        address: 10.0.63.198
+        port: 2514
+        transport: relp
 
 - type: replace
   path: /instance_groups/name=tcp-router/jobs/name=syslog_storer?
@@ -28,9 +29,10 @@
     name: syslog_forwarder
     release: syslog
     properties:
-      address: 10.0.63.198
-      port: 2514
-      transport: relp
+      syslog:
+        address: 10.0.63.198
+        port: 2514i
+        transport: relp
 
 - type: replace
   path: /instance_groups/name=api/jobs/name=syslog_forwarder?
@@ -38,6 +40,7 @@
     name: syslog_forwarder
     release: syslog
     properties:
-      address: 10.0.63.198
-      port: 2514
-      transport: relp
+      syslog:
+        address: 10.0.63.198
+        port: 2514
+        transport: relp
