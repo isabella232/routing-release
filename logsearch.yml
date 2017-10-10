@@ -9,6 +9,7 @@
 - type: replace
   path: /instance_groups/name=tcp-router/jobs/name=syslog_forwarder?
   value:
+    name: syslog_forwarder
     release: syslog
     properties:
       address: 10.0.63.198
@@ -18,6 +19,7 @@
 - type: replace
   path: /instance_groups/name=router/jobs/name=syslog_forwarder?
   value:
+    name: syslog_forwarder
     release: syslog
     properties:
       address: 10.0.63.198
@@ -27,6 +29,7 @@
 - type: replace
   path: /instance_groups/name=api/jobs/name=syslog_forwarder?
   value:
+    name: syslog_forwarder
     release: syslog
     properties:
       address: 10.0.63.198
