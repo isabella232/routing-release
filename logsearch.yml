@@ -17,6 +17,12 @@
       transport: relp
 
 - type: replace
+  path: /instance_groups/name=tcp-router/jobs/name=syslog_storer?
+  value:
+    name: syslog_storer
+    release: syslog
+
+- type: replace
   path: /instance_groups/name=router/jobs/name=syslog_forwarder?
   value:
     name: syslog_forwarder
