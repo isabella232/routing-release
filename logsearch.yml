@@ -1,5 +1,5 @@
 - type: replace
-  path: /releases/-
+  path: /releases/name=syslog?
   value:
     name: syslog
     url: https://bosh.io/d/github.com/cloudfoundry/syslog-release?v=11
@@ -11,30 +11,30 @@
   value:
     name: syslog_forwarder
     release: syslog
-    properties:
-      syslog:
-        address: 10.0.63.198
-        port: 2514
-        transport: relp
 
 - type: replace
   path: /instance_groups/name=router/jobs/name=syslog_forwarder?
   value:
     name: syslog_forwarder
     release: syslog
-    properties:
-      syslog:
-        address: 10.0.63.198
-        port: 2514i
-        transport: relp
 
 - type: replace
   path: /instance_groups/name=api/jobs/name=syslog_forwarder?
   value:
     name: syslog_forwarder
     release: syslog
-    properties:
-      syslog:
-        address: 10.0.63.198
-        port: 2514
-        transport: relp
+
+- type: replace
+  path: /instance_groups/-
+  value:
+    name: syslog_storer
+    azs:
+    - z1
+    instances: 1
+    jobs:
+    - name: syslog_storer
+      release: syslog
+    networks:
+    - name: default
+    stemcell: default
+    vm_type: minimal
