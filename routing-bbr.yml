@@ -2,5 +2,5 @@
 - type: replace
   path: /instance_groups/name=backup-restore/jobs/-
   value:
-  - name: bbr-routingdb
+    name: bbr-routingdb
     release: routing
