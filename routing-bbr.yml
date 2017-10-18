@@ -1,6 +1,13 @@
+# After we have a final release cut that includes BBR features
+# we should merge these changes into upstream
+#     cf-deployment/operations/experimental/enable-backup-restore.yml
 ---
 - type: replace
   path: /instance_groups/name=backup-restore/jobs/-
   value:
     name: bbr-routingdb
     release: routing
+
+- type: replace
+  path: /instance_groups/name=api/jobs/name=routing-api/properties?/release_level_backup
+  value: true
