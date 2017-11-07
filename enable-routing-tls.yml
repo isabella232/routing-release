@@ -4,5 +4,25 @@
   value: true
 
 - type: replace
+  path: /instance_groups/name=router/jobs/name=gorouter/properties?/router/backends/cert_chain
+  value: ((gorouter_backend.certificate))
+
+- type: replace
+  path: /instance_groups/name=router/jobs/name=gorouter/properties?/router/backends/private_key
+  value: ((gorouter_backend.private_key))
+
+- type: replace
   path: /instance_groups/name=router/jobs/name=gorouter/properties?/router/ca_certs
   value: ((diego_instance_identity_ca.ca))
+
+- type: replace
+  path: /variables/-
+  value:
+    name: gorouter_backend
+    options:
+      ca: diego_instance_identity_ca
+      common_name: gorouter
+      extended_key_usage:
+      - server_auth
+      - client_auth
+    type: certificate
