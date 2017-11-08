@@ -1,6 +1,6 @@
 # enable tls on mysql
 - type: replace
-  path: /instance_groups/name=singleton-database/jobs/name=mysql/properties/cf_mysql/mysql/tls?
+  path: /instance_groups/name=database/jobs/name=mysql/properties/cf_mysql/mysql/tls?
   value:
     ca_certificate: "((mysql_cert.ca))"
     server_certificate: "((mysql_cert.certificate))"
