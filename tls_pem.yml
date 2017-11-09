@@ -25,11 +25,6 @@
         AwEHoUQDQgAE7f43D0X/CK7PRzdd6IFRWxKmBf9OF1QPZ3pzHvcWjTYBpb/Df8GN
         Hqv1duBf+EnecXWC9OFhFv5wW4Cv1X2Olw==
         -----END EC PRIVATE KEY-----
-- type: remove
-  path: /instance_groups/name=router/jobs/name=gorouter/properties/router/ssl_cert?
-
-- type: remove
-  path: /instance_groups/name=router/jobs/name=gorouter/properties/router/ssl_key?
 
 - type: replace
   path: /instance_groups/name=router/jobs/name=gorouter/properties/router/cipher_suites?

@@ -1,24 +1,3 @@
 - type: replace
-  path: /instance_groups/name=router/jobs/name=gorouter/properties/router/ca_certs?
-  value: "((router_ssl.ca))"
-
-- type: replace
   path: /instance_groups/name=router/jobs/name=gorouter/properties/router/forwarded_client_cert?
   value: "sanitize_set"
-
-- type: replace
-  path: /instance_groups/name=routing_acceptance_tests/jobs/name=acceptance_tests/properties/acceptance_tests/xfcc?
-  value:
-    sanitize_set: ["foo.ws.batman.cf-app.com"]
-    client_pem: "((rats_tls_client.certificate))((rats_tls_client.private_key))"
-
-- type: replace
-  path: /variables/-
-  value:
-    name: rats_tls_client
-    type: certificate
-    options:
-      ca: router_ca
-      common_name: rats_tls_client
-      extended_key_usage:
-      - client_auth
