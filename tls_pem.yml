@@ -1,0 +1,31 @@
+- type: replace
+  path: /instance_groups/name=router/jobs/name=gorouter/properties/router/tls_pem?
+  value:
+    - cert_chain: |
+        -----BEGIN CERTIFICATE-----
+        MIICKDCCAc6gAwIBAgIJAIu/8ran/yiMMAkGByqGSM49BAEwRTELMAkGA1UEBhMC
+        VVMxEzARBgNVBAgTClNvbWUtU3RhdGUxITAfBgNVBAoTGEludGVybmV0IFdpZGdp
+        dHMgUHR5IEx0ZDAeFw0xNzA1MTgxOTE4MTVaFw0xNzA2MTcxOTE4MTVaMEUxCzAJ
+        BgNVBAYTAlVTMRMwEQYDVQQIEwpTb21lLVN0YXRlMSEwHwYDVQQKExhJbnRlcm5l
+        dCBXaWRnaXRzIFB0eSBMdGQwWTATBgcqhkjOPQIBBggqhkjOPQMBBwNCAATt/jcP
+        Rf8Irs9HN13ogVFbEqYF/04XVA9nenMe9xaNNgGlv8N/wY0eq/V24F/4Sd5xdYL0
+        4WEW/nBbgK/VfY6Xo4GnMIGkMB0GA1UdDgQWBBQ9ePfU+CUxM6JckzE7XE5iSoKV
+        0zB1BgNVHSMEbjBsgBQ9ePfU+CUxM6JckzE7XE5iSoKV06FJpEcwRTELMAkGA1UE
+        BhMCVVMxEzARBgNVBAgTClNvbWUtU3RhdGUxITAfBgNVBAoTGEludGVybmV0IFdp
+        ZGdpdHMgUHR5IEx0ZIIJAIu/8ran/yiMMAwGA1UdEwQFMAMBAf8wCQYHKoZIzj0E
+        AQNJADBGAiEArB11F5JfEUSebvq3Cbr45j8z8zfJyBwV4VqN9FEsM6gCIQC7f65z
+        9QJajpL/d4QuVuUFYdgG6wQOcQJdoO/rXzpwYA==
+        -----END CERTIFICATE-----
+      private_key: |
+        -----BEGIN EC PARAMETERS-----
+        BggqhkjOPQMBBw==
+        -----END EC PARAMETERS-----
+        -----BEGIN EC PRIVATE KEY-----
+        MHcCAQEEIBNI4oD5U7m+rqmv5MgKGsoVREYFgJwQODQ0hE1pEIv8oAoGCCqGSM49
+        AwEHoUQDQgAE7f43D0X/CK7PRzdd6IFRWxKmBf9OF1QPZ3pzHvcWjTYBpb/Df8GN
+        Hqv1duBf+EnecXWC9OFhFv5wW4Cv1X2Olw==
+        -----END EC PRIVATE KEY-----
+
+- type: replace
+  path: /instance_groups/name=router/jobs/name=gorouter/properties/router/cipher_suites?
+  value: "ECDHE-RSA-AES128-GCM-SHA256:TLS_ECDHE_ECDSA_WITH_RC4_128_SHA:TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA:TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA:TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256:TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384"

@@ -1,0 +1,32 @@
+# enable tls on mysql
+- type: replace
+  path: /instance_groups/name=database/jobs/name=mysql/properties/cf_mysql/mysql/tls?
+  value:
+    ca_certificate: "((mysql_cert.ca))"
+    server_certificate: "((mysql_cert.certificate))"
+    server_key: "((mysql_cert.private_key))"
+
+# cert generation
+- type: replace
+  path: /instance_groups/name=api/jobs/name=routing-api/properties/routing_api/sqldb/ca_cert?
+  value: ((mysql_cert.ca))
+
+- type: replace
+  path: /variables?/name=mysql_ca?
+  value:
+    name: mysql_ca
+    type: certificate
+    options:
+      is_ca: true
+      common_name: mysql_ca
+
+- type: replace
+  path: /variables?/name=mysql_cert?
+  value:
+    name: mysql_cert
+    type: certificate
+    options:
+      ca: mysql_ca
+      common_name: sql-db.service.cf.internal
+      extended_key_usage:
+      - server_auth
