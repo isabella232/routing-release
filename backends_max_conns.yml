@@ -1,3 +1,0 @@
-- type: replace
-  path: /instance_groups/name=router/jobs/name=gorouter/properties/router/backends?/max_conns
-  value: 20

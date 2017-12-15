@@ -1,5 +1,0 @@
----
-- type: replace
-  path: /instance_groups/name=router/jobs/name=gorouter/properties/router/tracing?
-  value:
-    enable_zipkin: true
