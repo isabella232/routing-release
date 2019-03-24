@@ -1,0 +1,22 @@
+- type: replace
+  path: /instance_groups/name=router/jobs/name=gorouter/properties/router/ca_certs
+  value: |
+    ((application_ca.certificate))
+    ((service_cf_internal_ca.certificate))
+    -----BEGIN CERTIFICATE-----
+    MIICyDCCAbACCQDX3m2Wfu+zFzANBgkqhkiG9w0BAQsFADAmMSQwIgYDVQQDDBsq
+    LmJhdG1hbi5yb3V0aW5nLmNmLWFwcC5jb20wHhcNMTkwMzIzMDUwMDIyWhcNMjEx
+    MjE3MDUwMDIyWjAmMSQwIgYDVQQDDBsqLmJhdG1hbi5yb3V0aW5nLmNmLWFwcC5j
+    b20wggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQCzuDicbXjPNW2tyeIr
+    VfVdO1hwHvHK58cTcpVUWm3UMuhty9hwOmuZ8WIq49h+jSxKOrtHh9H6aVB9xzWZ
+    BqNVQFqTNunt2Uy7OV6MMarjurDxipwsxdhjD+AzfQ0wVfqGmvCkF65M+YtLTRvD
+    NpMQ8lR4scSGOZUcfnTGbEpaFJuDatJHLlTX5tWPlK2onnnbP036+lmRpqfGklP4
+    f0iDenR6TnRhZ3S3H1ASs/mQbtUUmqrMAbiRT9Pc5dSowmZFG+qWG3RQH4dE9ux6
+    tWqDexJf6XBxCRvM22q1Beo2556B3sezzc4yhZDM+tX93lXSFjFqsX8M3lMqyHto
+    qzMvAgMBAAEwDQYJKoZIhvcNAQELBQADggEBAEM0Y1XEz3JPnGyQOV8uRZa50GdE
+    ZIN0PDIbFCfc7wvM6CWdkoL7w0BD7kkJMmonSrAHq1O1UthoxSVFjclOxlwrFT9e
+    ZUUvJCNUv/niGPOeIDSRLj+8p/Me58mvzLvffi9OnANY6tkOQ4xkbz13Y0BDyEYo
+    c4wqTaVhKS+ikpYnwjiLoy+IECrgy+GT5v5cavVLB8XVrb6vPYlx1acmeS2fFTIy
+    qeTHB4cBjkVZ1zHeDMvT1mF+Tjpja/+SjLwA0Iifm+XqUVOj24pE3NE7se9mdNhW
+    oWJPUdtN5NljPpQmfmuYY8PrCw1csL3/2bYo8C9YKhoiJNkzFxclhxXSuv4=
+    -----END CERTIFICATE-----
