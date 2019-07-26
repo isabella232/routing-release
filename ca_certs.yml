@@ -1,8 +1,9 @@
 - type: replace
   path: /instance_groups/name=router/jobs/name=gorouter/properties/router/ca_certs
   value: |
-    ((application_ca.certificate))
-    ((service_cf_internal_ca.certificate))
+    ((diego_instance_identity_ca.ca))
+    ((cc_tls.ca))
+    ((uaa_ssl.ca))
     -----BEGIN CERTIFICATE-----
     MIICyDCCAbACCQDX3m2Wfu+zFzANBgkqhkiG9w0BAQsFADAmMSQwIgYDVQQDDBsq
     LmJhdG1hbi5yb3V0aW5nLmNmLWFwcC5jb20wHhcNMTkwMzIzMDUwMDIyWhcNMjEx
