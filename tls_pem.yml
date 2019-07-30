@@ -2,6 +2,7 @@
   path: /instance_groups/name=router/jobs/name=gorouter/properties/router/tls_pem?
   value:
     - cert_chain: |
+        "((router_ssl.certificate))"
         -----BEGIN CERTIFICATE-----
         MIICKDCCAc6gAwIBAgIJAIu/8ran/yiMMAkGByqGSM49BAEwRTELMAkGA1UEBhMC
         VVMxEzARBgNVBAgTClNvbWUtU3RhdGUxITAfBgNVBAoTGEludGVybmV0IFdpZGdp
@@ -17,6 +18,7 @@
         9QJajpL/d4QuVuUFYdgG6wQOcQJdoO/rXzpwYA==
         -----END CERTIFICATE-----
       private_key: |
+        "((router_ssl.private_key))"
         -----BEGIN EC PARAMETERS-----
         BggqhkjOPQMBBw==
         -----END EC PARAMETERS-----
