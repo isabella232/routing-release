@@ -7,5 +7,5 @@
   path: /instance_groups/name=singleton-blobstore/jobs/name=blobstore/properties?/blobstore/release_level_backup?
   value: false
 - type: replace
-  path: /instance_groups/name=uaa/jobs/name=uaa/properties?/release_level_backup?
+  path: /instance_groups/name=backup-restore/jobs/name=bbr-uaadb/properties/release_level_backup?
   value: false
