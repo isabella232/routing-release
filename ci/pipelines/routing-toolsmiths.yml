@@ -49,7 +49,7 @@ resource_types:
   type: docker-image
   source:
     repository: cloudfoundry/bosh-deployment-resource
-- name: cfd-pool
+- name: toolsmiths-envs
   type: docker-image
   source:
     repository: cftoolsmiths/toolsmiths-envs-resource
@@ -198,11 +198,6 @@ resources:
   type: bosh-deployment
   icon: checkbox-blank
   source:
-- name: batman-deployment
-  type: bosh-deployment
-  icon: tools
-  source:
-    deployment: batman
 
 # CF Deployment
 - name: cf-deployment
@@ -234,7 +229,7 @@ resources:
   source:
     branch: master
     uri: https://github.com/cloudfoundry/cf-deployment-concourse-tasks.git
-    tag_filter: v10.*
+    # tag_filter: v10.*
 
 - name: cf-acceptance-tests
   type: git
@@ -293,11 +288,12 @@ resources:
 
 #Toolsmith pool
 - name: batman-env
-  type: cfd-pool
+  type: toolsmiths-envs
   source:
     api_token: ((toolsmiths_api_key))
     sa_gcp_key: ((shared_gcp_account_creds))
     pool_name: cf-deployment
+    hostname: environments.toolsmiths.cf-app.com
   tags:
   - vsphere-cf-networking
 
@@ -641,55 +637,80 @@ jobs:
       release-dir: routing-release
     output_mapping:
       release-tarball: routing-release-tarball
-  - put: batman-deployment
-    params:
-      source_file: bosh-director/source.json
-      manifest: cf-deployment/cf-deployment.yml
-      releases:
-      - routing-release-tarball/*
-      vars_files:
-      - bosh-director/vars*
-      ops_files:
-      - merged-operations/scale-to-one-az.yml
-      - merged-operations/use-compiled-releases.yml
-      - merged-operations/experimental/fast-deploy-with-downtime-and-danger.yml
-      # - merged-operations/update_watch.yml does this matter?
-      - merged-operations/syslog.yml
-      - merged-operations/routing_acceptance_tests.yml
-      - merged-operations/routing_smoke_tests.yml
-      - merged-operations/add-datadog-firehose-nozzle.yml
-      # - merged-operations/test/add-persistent-isolation-segment-diego-cell.yml
-      # - merged-operations/test/add-persistent-isolation-segment-router.yml
-      # - merged-operations/add-persistent-isolation-segment-router-ca-certs.yml
-      - merged-operations/tls_pem.yml
-      - merged-operations/smoke_tests.yml
-      - merged-operations/xfcc.yml
-      - merged-operations/backends_max_conns.yml
-      # - merged-operations/isolation_in_z3.yml
-      - merged-operations/backup-and-restore/enable-backup-restore.yml
-      - merged-operations/disable_bbr_non_routing.yml
-      - merged-operations/disable-blobstore-backup.yml
-      # - merged-operations/enable_locket_isolated_diego.yml
-      - merged-operations/create-indicator-protocol-uaa-client.yml
-      - merged-operations/ca_certs.yml
-      stemcells: [gcp-stemcell-xenial/*.tgz]
+  # - put: batman-deployment
+  #   params:
+  #     source_file: bosh-director/source.json
+  #     manifest: cf-deployment/cf-deployment.yml
+  #     releases:
+  #     - routing-release-tarball/*
+  #     vars_files:
+  #     - bosh-director/vars*
+  #     ops_files:
+  #     - merged-operations/scale-to-one-az.yml
+  #     - merged-operations/use-compiled-releases.yml
+  #     - merged-operations/experimental/fast-deploy-with-downtime-and-danger.yml
+  #     # - merged-operations/update_watch.yml does this matter?
+  #     - merged-operations/syslog.yml
+  #     - merged-operations/routing_acceptance_tests.yml
+  #     - merged-operations/routing_smoke_tests.yml
+  #     - merged-operations/add-datadog-firehose-nozzle.yml
+  #     # - merged-operations/test/add-persistent-isolation-segment-diego-cell.yml
+  #     # - merged-operations/test/add-persistent-isolation-segment-router.yml
+  #     # - merged-operations/add-persistent-isolation-segment-router-ca-certs.yml
+  #     - merged-operations/tls_pem.yml
+  #     - merged-operations/smoke_tests.yml
+  #     - merged-operations/xfcc.yml
+  #     - merged-operations/backends_max_conns.yml
+  #     # - merged-operations/isolation_in_z3.yml
+  #     - merged-operations/backup-and-restore/enable-backup-restore.yml
+  #     - merged-operations/disable_bbr_non_routing.yml
+  #     - merged-operations/disable-blobstore-backup.yml
+  #     # - merged-operations/enable_locket_isolated_diego.yml
+  #     - merged-operations/create-indicator-protocol-uaa-client.yml
+  #     - merged-operations/ca_certs.yml
+  #     stemcells: [gcp-stemcell-xenial/*.tgz]
       # cleanup: true
   # - get: batman-deployment
   #   params:
   #     source_file: bosh-director/source.json
 
-  # - task: deploy-batman-with-created-routing
-  #   file: cf-deployment-concourse-tasks/bosh-deploy-with-created-release/task.yml
-  #   input_mapping:
-  #     bbl-state: deployments-routing
-  #     release: routing-release
-  #     ops-files: merged-operations
-  #     vars-store: deployments-routing
-  #     vars-files: deployments-routing
-  #   params:
-  #     SYSTEM_DOMAIN: batman.routing.cf-app.com
-  #     OPS_FILES: |
-  #     BBL_STATE_DIR: batman/bbl-state
+
+  - task: deploy-batman-with-created-routing
+    file: cf-deployment-concourse-tasks/bosh-deploy-with-created-release/task.yml
+    input_mapping:
+      toolsmiths-env: batman-env
+      release: routing-release
+      ops-files: merged-operations
+      vars-store: deployments-routing
+      vars-files: deployments-routing
+    params:
+      SYSTEM_DOMAIN: batman.routing.cf-app.com
+      OPS_FILES: |
+        scale-to-one-az.yml
+        use-compiled-releases.yml
+        experimental/fast-deploy-with-downtime-and-danger.yml
+        use-compiled-releases.yml
+        update_watch.yml
+        syslog.yml
+        routing_acceptance_tests.yml
+        routing_smoke_tests.yml
+        add-datadog-firehose-nozzle.yml
+        test/add-persistent-isolation-segment-diego-cell.yml
+        test/add-persistent-isolation-segment-router.yml
+        add-persistent-isolation-segment-router-ca-certs.yml
+        tls_pem.yml
+        smoke_tests.yml
+        xfcc.yml
+        backends_max_conns.yml
+        isolation_in_z3.yml
+        backup-and-restore/enable-backup-restore.yml
+        disable_bbr_non_routing.yml
+        disable-blobstore-backup.yml
+        enable_locket_isolated_diego.yml
+        create-indicator-protocol-uaa-client.yml
+        ca_certs.yml
+
+
   # - task: create-isolation-segment
   #   file: routing-release-ci/ci/tasks/create-isolation-segment/task.yml
   #   params:
@@ -704,63 +725,6 @@ jobs:
       AWS_ENV: batman
       DATADOG_API_KEY: ((datadog_api_key))
 
-# - name: batman-setup
-#   serial_groups: [batman]
-#   build_logs_to_retain: 100
-#   plan:
-#   - in_parallel:
-#     - get: cf-deployment-concourse-tasks
-#     - get: deployments-routing
-#     - get: routing-release-ci
-#     - get: bosh-bootloader
-#     - get: friday-trigger
-#       trigger: true
-#   - task: add-parent-dns
-#     file: routing-release-ci/ci/tasks/add-parent-dns/task.yml
-#     params:
-#       ENVIRONMENT: batman
-#     input_mapping:
-#       bbl-state: deployments-routing
-#   - task: inject-plan-patches
-#     file: routing-release-ci/ci/tasks/inject-plan-patches/task.yml
-#     params:
-#       BBL_STATE_DIR: batman/bbl-state
-#       PLAN_PATCH_DIR: plan-patches/iso-segs-gcp
-#     input_mapping:
-#       bbl-state: updated-bbl-state
-#       plan-patches: bosh-bootloader
-#   - task: make-certs
-#     file: routing-release-ci/ci/tasks/make-certs/task.yml
-#     params:
-#       ENVIRONMENT: batman
-#     input_mapping:
-#       bbl-state: updated-bbl-state
-#   - task: setup-batman
-#     file: cf-deployment-concourse-tasks/bbl-up/task.yml
-#     params:
-#       BBL_IAAS: gcp
-#       BBL_GCP_SERVICE_ACCOUNT_KEY: ((shared_gcp_account_creds))
-#       BBL_GCP_REGION: us-west1
-#       BBL_LB_CERT: ../lb_certs/cert.pem
-#       BBL_LB_KEY: ../lb_certs/key.pem
-#       LB_DOMAIN: batman.routing.cf-app.com
-#       BBL_ENV_NAME: batman
-#       BBL_STATE_DIR: batman/bbl-state
-#       GIT_COMMIT_EMAIL: cf-routing-eng@pivotal.io
-#     input_mapping:
-#       bbl-config: updated-bbl-state
-#       bbl-state: updated-bbl-state
-#     ensure:
-#       put: deployments-routing
-#       params:
-#         repository: updated-bbl-state
-#         rebase: true
-#   - task: add-credhub-value
-#     file: routing-release-ci/ci/tasks/add-credhub-value/task.yml
-#     params:
-#       ENVIRONMENT: batman
-#       NAME: /bosh-batman/cf/datadog_api_key
-#       VALUE: ((datadog_api_key))
 
 # - name: batman-deploy-cf
 #   serial_groups: [batman]
