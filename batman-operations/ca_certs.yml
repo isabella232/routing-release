@@ -1,0 +1,35 @@
+- type: replace
+  path: /instance_groups/name=router/jobs/name=gorouter/properties/router/ca_certs
+  value: |
+    ((diego_instance_identity_ca.ca))
+    ((application_ca.certificate))
+    ((service_cf_internal_ca.certificate))
+    ((cc_tls.ca))
+    ((uaa_ssl.ca))
+    -----BEGIN CERTIFICATE-----
+    MIIEgTCCAmmgAwIBAgIQSqQXgUkkmjNzoamcIjDyEjANBgkqhkiG9w0BAQsFADAR
+    MQ8wDQYDVQQDEwZmYWtlQ0EwHhcNMTkwNzAxMjMxMjUxWhcNMjEwMTAxMjMwMjE5
+    WjAmMSQwIgYDVQQDDBsqLmJhdG1hbi5yb3V0aW5nLmNmLWFwcC5jb20wggEiMA0G
+    CSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQCY7KuqyugNjqnXHMrvk+p8smfK1Gkb
+    t/Pm7fcL7pvSNO1OCFYfgwmcL7wL99Dv9spr5GJQ4Qx0mqs8zQMgnKkdxSAxcAuV
+    7TuyNMbnGJNhvKAzt0Yu9mzi1DrzN/q3fk4a7zGNW7a5/86+Kqys36Yk0KWZrUg2
+    l9N9R8FOyTYX+8ImGLJlPENqhNYkYfE9L3qfosphcU+O5MwCu6voLEOUDOcX3+fP
+    op/O3JabG+X2AsSqmw2lX7RwpfeQmcQVCyS7SfJjI0BPMGA4lG494xqna7MYE1B9
+    k9rnOMLPhwGR0/TjzI36KwO/HLkr5O9X4YliB24ObCpLtKDeG2eCcgYpAgMBAAGj
+    gb8wgbwwDgYDVR0PAQH/BAQDAgO4MB0GA1UdJQQWMBQGCCsGAQUFBwMBBggrBgEF
+    BQcDAjAdBgNVHQ4EFgQUedZMv3Edkh2WhQrzZ3a935GaH6owHwYDVR0jBBgwFoAU
+    RuAUOwxurIMctwi15ELGWFRZXv0wSwYDVR0RBEQwQoIbKi5iYXRtYW4ucm91dGlu
+    Zy5jZi1hcHAuY29tgiMqLmlzby1zZWcuYmF0bWFuLnJvdXRpbmcuY2YtYXBwLmNv
+    bTANBgkqhkiG9w0BAQsFAAOCAgEAIa+tADoyHGqBjWIZwD4nw5QHfr3+pHcX7DvS
+    f6h80oP0/NS2MTf0t6ZbPIunrbrXFH/S6Vmf+TAVEVNnyNnQEzCOLwqQZZh154Ec
+    iM0zXE78SwbtrsbCmU5wRACHpeU6HfXPFwC+o9XvFXUEs9HsPnTjxaJQ28gR9esn
+    ISiSPI98uwpbXHg0Xsemqgx70bxeBZK3T3Ftr3Y1zg7vv0XwItqFElr/v2VsM6MA
+    6jw+ATHhVfxk5Hx6Wse0tbn5KAyc3IxgRsQqRxmkgQ3pM40Bq74caz8neo98m+5D
+    jOT+yUFWmaJxnGFptauWKxt8B2Z+sF0nt4Oxzuk8haDaneFPkz1ygEFReQFw8TiO
+    OLkn3ZBXw0AeJRr3kNhHSv8+QGroqMSp4waEQXuoQ9TALTVvk7Dp19mz4n1oXBaf
+    ffpHOsNqMkJcEkGHMYQtIe3yNJxAPhiq+mx9J6wDLTyzra+8LZqzKF/lrCqpNIxJ
+    EJoLFGC23QBiCp4JEPKkykYWKtICOIaC4LPew0qTpEdWiXT+RNYo87XSMXNe8zH/
+    GEorO7U/101r8EQb2PxKZNxWYMVpwNG2xp8OyzWCx3NKGFWrfSENSF5NVqMOM/9r
+    fPSgV1dvVjHYlp6yBozLUh35hZea/tkgzmQDnnczgbGoZOAKX1e5tS9LoINMJJ5x
+    PPeVy7c=
+    -----END CERTIFICATE-----
