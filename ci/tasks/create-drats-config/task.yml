@@ -8,7 +8,7 @@ image_resource:
 
 inputs:
   - name: routing-release-ci
-  - name: deployments-routing
+  - name: networking-oss-deployments
 
 outputs:
   - name: created-drats-config

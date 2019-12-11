@@ -24,9 +24,9 @@ bosh_ca_cert="${BOSH_CA_CERT}"
 ssh_proxy_cidr="${SSH_DESTINATION_CIDR}"
 ssh_proxy_user="${BOSH_GW_USER}"
 
-drats_integration_config="${ENVIRONMENT}/drats_integration_config.json"
+drats_integration_config="environments/${ENVIRONMENT}/drats_integration_config.json"
 
-pushd "deployments-routing/${ENVIRONMENT}/bbl-state"
+pushd "networking-oss-deployments/environments/${ENVIRONMENT}/bbl-state"
   bbl version
   cf_api_url="https://api.$(jq .lb.domain bbl-state.json -r)"
   ssh_proxy_host="$(bbl jumpbox-address)"
@@ -42,7 +42,7 @@ done
 
 integration_config=$(echo ${integration_config} | jq '.["include_cf-routing"]=true')
 
-pushd "deployments-routing"
+pushd "networking-oss-deployments"
   echo "$integration_config" > "${drats_integration_config}"
 
   set_git_config
@@ -50,4 +50,4 @@ pushd "deployments-routing"
   git commit -m "creating drats config for ${ENVIRONMENT}"
 popd
 
-git clone deployments-routing created-drats-config/
+git clone networking-oss-deployments created-drats-config/
