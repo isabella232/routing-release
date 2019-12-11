@@ -115,4 +115,4 @@ EOF
   git commit -m"creating integration configs for ${ENVIRONMENT}"
 popd
 
-git clone deployments-routing created-integration-configs/
+git clone networking-oss-deployments created-integration-configs/
