@@ -24,7 +24,7 @@ bosh_ca_cert="${BOSH_CA_CERT}"
 ssh_proxy_cidr="${SSH_DESTINATION_CIDR}"
 ssh_proxy_user="${BOSH_GW_USER}"
 
-drats_integration_config="environments/${ENVIRONMENT}/drats_integration_config.json"
+drats_integration_config="${ENV_DIR}/${ENVIRONMENT}/drats_integration_config.json"
 
 pushd "networking-oss-deployments/environments/${ENVIRONMENT}/bbl-state"
   bbl version

@@ -17,6 +17,7 @@ params:
   ENVIRONMENT:
   GIT_COMMIT_EMAIL: cf-routing-eng@pivotal.io
   GIT_COMMIT_USERNAME: "CI Bot"
+  ENV_DIR: environments
 
 run:
   path: routing-release-ci/ci/tasks/create-drats-config/task
