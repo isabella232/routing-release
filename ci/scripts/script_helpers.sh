@@ -4,7 +4,7 @@ function bosh_login() {
   ENV=${1}
   ENV_DIR="${ENV_DIR:-}"
   DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-  DEPLOYMENT_DIR="${DIR}/../../../deployments-routing/${ENV_DIR}/${ENV}"
+  DEPLOYMENT_DIR="${DIR}/../../../networking-oss-deployments/${ENV_DIR}/${ENV}"
 
   if [ "$ENV" = "lite" ]; then
     bosh_login_lite

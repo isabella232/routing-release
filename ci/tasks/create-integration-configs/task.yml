@@ -8,7 +8,7 @@ image_resource:
 
 inputs:
   - name: routing-release-ci
-  - name: deployments-routing
+  - name: networking-oss-deployments
   - name: cf-deployment-concourse-tasks
 
 outputs:
@@ -25,3 +25,5 @@ params:
   VARS_STORE_FILE: deployment-vars.yml
   GIT_COMMIT_EMAIL: cf-routing-eng@pivotal.io
   GIT_COMMIT_USERNAME: "CI Bot"
+  ENV_DIR: environments
+
