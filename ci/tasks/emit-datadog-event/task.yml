@@ -8,7 +8,7 @@ image_resource:
 
 inputs:
   - name: deployments-routing
-  - name: routing-release-ci
+  - name: networking-oss-deployments
 
 run:
   path: routing-release-ci/ci/tasks/emit-datadog-event/task
