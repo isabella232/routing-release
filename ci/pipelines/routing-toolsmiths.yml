@@ -521,174 +521,38 @@ jobs:
   serial_groups: [batman]
   plan:
   - in_parallel:
-    - get: batman-env
-      passed:
-        - claim-batman
-      tags:
-      - vsphere-cf-networking
     - get: cf-deployment-concourse-tasks
     - get: cf-deployment
       trigger: true
     - get: deployments-routing
     - get: routing-release
       trigger: true
-      # passed:
-      # - routing-release-unit
+      passed:
+      - routing-release-unit
     - get: routing-release-ci
-    - get: gcp-stemcell-xenial
-      trigger: true
-  - task: generate-bosh-deployment-source-json
+    - get: batman-env
+      passed:
+        - claim-batman
+      tags:
+      - vsphere-cf-networking
+  - task: upload-stemcell
+    file: cf-deployment-concourse-tasks/bosh-upload-stemcell-from-cf-deployment/task.yml
     input_mapping:
-      env: batman-env
-    config:
-      platform: linux
-      image_resource:
-        type: docker-image
-        source:
-          repository: cloudfoundry/cf-routing-pipeline
-      inputs:
-      - name: env
-      outputs:
-      - name: bosh-director
-      run:
-        path: bash
-        args:
-        - -c
-        - |
-            set -e -o pipefail
-            mkdir -p bosh-director
-            jq -n \
-              --arg target "$(cat env/metadata | jq -r .bosh.bosh_environment)" \
-              --arg caCert "$(cat env/metadata | jq -r .bosh.bosh_ca_cert)" \
-              --arg client "$(cat env/metadata | jq -r .bosh.bosh_client)" \
-              --arg clientSecret "$(cat env/metadata | jq -r .bosh.bosh_client_secret)" \
-              --arg jumpboxURL "$(cat env/metadata | jq -r .bosh.bosh_all_proxy | cut -d'@' -f2 | cut -d'?' -f1)" \
-              --arg jumpboxSSHKey "$(cat env/metadata | jq -r .bosh.jumpbox_private_key)" \
-              --arg systemDomain "$(cat env/metadata | jq -r .cf.api_url | cut -d'.' -f2-)" \
-              '{
-                "target": $target,
-                "ca_cert": $caCert,
-                "client": $client,
-                "client_secret": $clientSecret,
-                "deployment": "cf",
-                "system_domain": $systemDomain,
-                "jumpbox_url": $jumpboxURL,
-                "jumpbox_ssh_key": $jumpboxSSHKey
-              }' > bosh-director/source.json
-
-            # Target bosh
-
-            function bosh_login() {
-              eval "$(cat env/metadata  | jq  '.bosh | with_entries( .key |= ascii_upcase) | to_entries[] | "export \(.key)='"'"'\(.value)'"'"'"' -r)"
-              export ENV_NAME=$(cat env/name)
-
-              key_path="$(mktemp -d)/$ENV_NAME.priv"
-              export BOSH_ALL_PROXY=${BOSH_ALL_PROXY/$ENV_NAME.priv/$key_path}
-              export BOSH_DEPLOYMENT="cf"
-              export CREDHUB_PROXY=$BOSH_ALL_PROXY
-              echo "$JUMPBOX_PRIVATE_KEY" > "${key_path}"
-              chmod 600 "${key_path}"
-              bosh -e "${BOSH_ENVIRONMENT}" --ca-cert <(echo "${BOSH_CA_CERT}") alias-env "${ENV_NAME}"
-              bosh login
-            }
-
-            bosh_login
-
-            export SYSTEM_DOMAIN=$(cat bosh-director/source.json | jq -r '.system_domain')
-            credhub set -n "/bosh-${ENV_NAME}/cf/system_domain" -t value -v "${SYSTEM_DOMAIN}" > /dev/null
-            # bosh -d cf manifest > bosh-director/manifest.yml
-
-            jq -n --arg system_domain "${SYSTEM_DOMAIN}" \
-              '{ "system_domain": $system_domain }' > bosh-director/vars.json
-  - task: add-credhub-cf-password
-    params:
-      NAME: datadog_api_key
-      VALUE: ((datadog_api_key))
-    input_mapping:
-      env: batman-env
-    config:
-      platform: linux
-      image_resource:
-        type: docker-image
-        source:
-          repository: cloudfoundry/cf-routing-pipeline
-      inputs:
-      - name: env
-      run:
-        path: bash
-        args:
-        - -c
-        - |
-            set -e -o pipefail
-
-            # Target bosh
-            eval "$(cat env/metadata  | jq  '.bosh | with_entries( .key |= ascii_upcase) | to_entries[] | "export \(.key)='"'"'\(.value)'"'"'"' -r)"
-            export ENV_NAME=$(cat env/name)
-            echo "$JUMPBOX_PRIVATE_KEY" > $ENV_NAME.priv
-            export CREDHUB_PROXY=$BOSH_ALL_PROXY
-            credhub set -n "/bosh-${ENV_NAME}/cf/${NAME}" -t password -w "${VALUE}" &> /dev/null
+      toolsmiths-env: batman-env
   - task: merge-ops-files
     file: routing-release-ci/ci/tasks/merge-ops-files/task.yml
     params:
       ENVIRONMENT: batman
-  - task: create-routing-release-tarball
-    file: routing-release-ci/ci/tasks/create-release-tarball/task.yml
-    input_mapping:
-      release-dir: routing-release
-    output_mapping:
-      release-tarball: routing-release-tarball
-  # - put: batman-deployment
-  #   params:
-  #     source_file: bosh-director/source.json
-  #     manifest: cf-deployment/cf-deployment.yml
-  #     releases:
-  #     - routing-release-tarball/*
-  #     vars_files:
-  #     - bosh-director/vars*
-  #     ops_files:
-  #     - merged-operations/scale-to-one-az.yml
-  #     - merged-operations/use-compiled-releases.yml
-  #     - merged-operations/experimental/fast-deploy-with-downtime-and-danger.yml
-  #     # - merged-operations/update_watch.yml does this matter?
-  #     - merged-operations/syslog.yml
-  #     - merged-operations/routing_acceptance_tests.yml
-  #     - merged-operations/routing_smoke_tests.yml
-  #     - merged-operations/add-datadog-firehose-nozzle.yml
-  #     # - merged-operations/test/add-persistent-isolation-segment-diego-cell.yml
-  #     # - merged-operations/test/add-persistent-isolation-segment-router.yml
-  #     # - merged-operations/add-persistent-isolation-segment-router-ca-certs.yml
-  #     - merged-operations/tls_pem.yml
-  #     - merged-operations/smoke_tests.yml
-  #     - merged-operations/xfcc.yml
-  #     - merged-operations/backends_max_conns.yml
-  #     # - merged-operations/isolation_in_z3.yml
-  #     - merged-operations/backup-and-restore/enable-backup-restore.yml
-  #     - merged-operations/disable_bbr_non_routing.yml
-  #     - merged-operations/disable-blobstore-backup.yml
-  #     # - merged-operations/enable_locket_isolated_diego.yml
-  #     - merged-operations/create-indicator-protocol-uaa-client.yml
-  #     - merged-operations/ca_certs.yml
-  #     stemcells: [gcp-stemcell-xenial/*.tgz]
-      # cleanup: true
-  # - get: batman-deployment
-  #   params:
-  #     source_file: bosh-director/source.json
-
-
   - task: deploy-batman-with-created-routing
     file: cf-deployment-concourse-tasks/bosh-deploy-with-created-release/task.yml
     input_mapping:
       toolsmiths-env: batman-env
       release: routing-release
       ops-files: merged-operations
-      vars-store: deployments-routing
       vars-files: deployments-routing
     params:
       SYSTEM_DOMAIN: batman.routing.cf-app.com
       OPS_FILES: |
-        scale-to-one-az.yml
-        use-compiled-releases.yml
-        experimental/fast-deploy-with-downtime-and-danger.yml
         use-compiled-releases.yml
         update_watch.yml
         syslog.yml
@@ -709,13 +573,11 @@ jobs:
         enable_locket_isolated_diego.yml
         create-indicator-protocol-uaa-client.yml
         ca_certs.yml
-
-
-  # - task: create-isolation-segment
-  #   file: routing-release-ci/ci/tasks/create-isolation-segment/task.yml
-  #   params:
-  #     ENVIRONMENT: batman
-  #     ISO_SEG_NAME: "persistent_isolation_segment"
+  - task: create-isolation-segment
+    file: routing-release-ci/ci/tasks/create-isolation-segment/task.yml
+    params:
+      ENVIRONMENT: batman
+      ISO_SEG_NAME: "persistent_isolation_segment"
   - task: emit-datadog-deploy-end
     file: routing-release-ci/ci/tasks/emit-datadog-event/task.yml
     params:
@@ -724,76 +586,6 @@ jobs:
       PRIORITY: normal
       AWS_ENV: batman
       DATADOG_API_KEY: ((datadog_api_key))
-
-
-# - name: batman-deploy-cf
-#   serial_groups: [batman]
-#   plan:
-#   - in_parallel:
-#     - get: cf-deployment-concourse-tasks
-#     - get: cf-deployment
-#       trigger: true
-#     - get: deployments-routing
-#     - get: routing-release
-#       trigger: true
-#       passed:
-#       - routing-release-unit
-#     - get: routing-release-ci
-#   - task: upload-stemcell
-#     file: cf-deployment-concourse-tasks/bosh-upload-stemcell-from-cf-deployment/task.yml
-#     input_mapping:
-#       bbl-state: deployments-routing
-#     params:
-#       BBL_STATE_DIR: batman/bbl-state
-#   - task: merge-ops-files
-#     file: routing-release-ci/ci/tasks/merge-ops-files/task.yml
-#     params:
-#       ENVIRONMENT: batman
-#   - task: deploy-batman-with-created-routing
-#     file: cf-deployment-concourse-tasks/bosh-deploy-with-created-release/task.yml
-#     input_mapping:
-#       bbl-state: deployments-routing
-#       release: routing-release
-#       ops-files: merged-operations
-#       vars-store: deployments-routing
-#       vars-files: deployments-routing
-#     params:
-#       SYSTEM_DOMAIN: batman.routing.cf-app.com
-#       OPS_FILES: |
-#         use-compiled-releases.yml
-#         update_watch.yml
-#         syslog.yml
-#         routing_acceptance_tests.yml
-#         routing_smoke_tests.yml
-#         add-datadog-firehose-nozzle.yml
-#         test/add-persistent-isolation-segment-diego-cell.yml
-#         test/add-persistent-isolation-segment-router.yml
-#         add-persistent-isolation-segment-router-ca-certs.yml
-#         tls_pem.yml
-#         smoke_tests.yml
-#         xfcc.yml
-#         backends_max_conns.yml
-#         isolation_in_z3.yml
-#         backup-and-restore/enable-backup-restore.yml
-#         disable_bbr_non_routing.yml
-#         disable-blobstore-backup.yml
-#         enable_locket_isolated_diego.yml
-#         create-indicator-protocol-uaa-client.yml
-#         ca_certs.yml
-#       BBL_STATE_DIR: batman/bbl-state
-#   - task: create-isolation-segment
-#     file: routing-release-ci/ci/tasks/create-isolation-segment/task.yml
-#     params:
-#       ENVIRONMENT: batman
-#       ISO_SEG_NAME: "persistent_isolation_segment"
-#   - task: emit-datadog-deploy-end
-#     file: routing-release-ci/ci/tasks/emit-datadog-event/task.yml
-#     params:
-#       TITLE: end_deploy
-#       TEXT: end_deploy
-#       PRIORITY: normal
-#       AWS_ENV: batman
-#       DATADOG_API_KEY: ((datadog_api_key))
 
 - name: batman-cats
   serial_groups: [batman]
