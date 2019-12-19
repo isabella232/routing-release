@@ -227,8 +227,9 @@ resources:
   type: git
   icon: github-box
   source:
-    branch: master
-    uri: https://github.com/cloudfoundry/cf-deployment-concourse-tasks.git
+    branch: brick-test
+    # uri: https://github.com/cloudfoundry/cf-deployment-concourse-tasks.git
+    uri: https://github.com/cf-routing/cf-deployment-concourse-tasks.git
     # tag_filter: v10.*
 
 - name: cf-acceptance-tests
@@ -551,26 +552,19 @@ jobs:
       ops-files: merged-operations
       vars-files: deployments-routing
     params:
-      SYSTEM_DOMAIN: batman.routing.cf-app.com
       OPS_FILES: |
         use-compiled-releases.yml
         update_watch.yml
         syslog.yml
         routing_acceptance_tests.yml
         routing_smoke_tests.yml
-        add-datadog-firehose-nozzle.yml
-        test/add-persistent-isolation-segment-diego-cell.yml
-        test/add-persistent-isolation-segment-router.yml
-        add-persistent-isolation-segment-router-ca-certs.yml
         tls_pem.yml
         smoke_tests.yml
         xfcc.yml
         backends_max_conns.yml
-        isolation_in_z3.yml
         backup-and-restore/enable-backup-restore.yml
         disable_bbr_non_routing.yml
         disable-blobstore-backup.yml
-        enable_locket_isolated_diego.yml
         create-indicator-protocol-uaa-client.yml
         ca_certs.yml
   - task: create-isolation-segment
@@ -578,14 +572,6 @@ jobs:
     params:
       ENVIRONMENT: batman
       ISO_SEG_NAME: "persistent_isolation_segment"
-  - task: emit-datadog-deploy-end
-    file: routing-release-ci/ci/tasks/emit-datadog-event/task.yml
-    params:
-      TITLE: end_deploy
-      TEXT: end_deploy
-      PRIORITY: normal
-      AWS_ENV: batman
-      DATADOG_API_KEY: ((datadog_api_key))
 
 - name: batman-cats
   serial_groups: [batman]
@@ -726,7 +712,7 @@ jobs:
             --arg cf_api_url "https://$(jq -r '.cf.api_url' < env/metadata)" \
             --arg cf_deployment_name "cf" \
             --arg cf_admin_username "admin" \
-            --arg cf_admin_password "$(credhub get -j -n /bosh-independence/cf/cf_admin_password | jq -r .value)" \
+            --arg cf_admin_password "$(credhub get -j -n /bosh-${ENV_NAME}/cf/cf_admin_password | jq -r .value)" \
             --arg bosh_environment "$BOSH_ENVIRONMENT" \
             --arg bosh_client "$BOSH_CLIENT" \
             --arg bosh_client_secret "$BOSH_CLIENT_SECRET" \
