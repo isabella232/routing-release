@@ -669,74 +669,9 @@ jobs:
     trigger: true
     passed: [batman-deploy-cf]
   - task: create-drats-config
+    file: routing-release-ci/ci/tasks/create-drats-config-toolsmiths/task.yml
     input_mapping:
-      env: batman-env
-    config:
-      platform: linux
-      image_resource:
-        type: docker-image
-        source:
-          repository: cloudfoundry/cf-routing-pipeline
-      inputs:
-      - name: env
-      outputs:
-      - name: drats-integration-config
-      run:
-        path: bash
-        args:
-        - -c
-        - |
-          set -euo pipefail
-
-          function bosh_login() {
-            eval "$(cat env/metadata  | jq  '.bosh | with_entries( .key |= ascii_upcase) | to_entries[] | "export \(.key)='"'"'\(.value)'"'"'"' -r)"
-            export ENV_NAME=$(cat env/name)
-
-            key_path="$(mktemp -d)/$ENV_NAME.priv"
-            export BOSH_DEPLOYMENT="cf"
-            export BOSH_ALL_PROXY=${BOSH_ALL_PROXY/$ENV_NAME.priv/$key_path}
-            export CREDHUB_PROXY=$BOSH_ALL_PROXY
-            echo "$JUMPBOX_PRIVATE_KEY" > "${key_path}"
-            chmod 600 "${key_path}"
-            bosh -e "${BOSH_ENVIRONMENT}" --ca-cert <(echo "${BOSH_CA_CERT}") alias-env "${ENV_NAME}"
-            bosh login
-          }
-
-          bosh_login
-
-          mkdir -p drats-config
-
-          ssh_proxy_host=$(python2 -c "from urlparse import urlparse; print(urlparse('$BOSH_ALL_PROXY').hostname)")
-
-          jq -n \
-            --arg cf_api_url "https://$(jq -r '.cf.api_url' < env/metadata)" \
-            --arg cf_deployment_name "cf" \
-            --arg cf_admin_username "admin" \
-            --arg cf_admin_password "$(credhub get -j -n /bosh-${ENV_NAME}/cf/cf_admin_password | jq -r .value)" \
-            --arg bosh_environment "$BOSH_ENVIRONMENT" \
-            --arg bosh_client "$BOSH_CLIENT" \
-            --arg bosh_client_secret "$BOSH_CLIENT_SECRET" \
-            --arg bosh_ca_cert "$BOSH_CA_CERT" \
-            --arg ssh_proxy_cidr "10.0.0.0/8" \
-            --arg ssh_proxy_user "jumpbox" \
-            --arg ssh_proxy_host "$ssh_proxy_host" \
-            --arg ssh_proxy_private_key "$JUMPBOX_PRIVATE_KEY" \
-                '{
-                  "cf_api_url": $cf_api_url,
-                  "cf_deployment_name": $cf_deployment_name,
-                  "cf_admin_username": $cf_admin_username,
-                  "cf_admin_password": $cf_admin_password,
-                  "bosh_environment": $bosh_environment,
-                  "bosh_client": $bosh_client,
-                  "bosh_client_secret": $bosh_client_secret,
-                  "bosh_ca_cert": $bosh_ca_cert,
-                  "ssh_proxy_cidr": $ssh_proxy_cidr,
-                  "ssh_proxy_user": $ssh_proxy_user,
-                  "ssh_proxy_host": $ssh_proxy_host,
-                  "ssh_proxy_private_key": $ssh_proxy_private_key,
-                  "include_cf-routing": true
-                }' > drats-integration-config/drats_integration_config.json
-
+      metadata-dir: batman-env
   - task: run-disaster-recovery-acceptance-tests
     file: disaster-recovery-acceptance-tests/ci/drats-with-integration-config/task.yml
     privileged: true
