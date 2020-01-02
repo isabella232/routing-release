@@ -754,65 +754,14 @@ jobs:
     - get: routing-release
       passed: [batman-deploy-cf]
       trigger: true
-    - get: deployments-routing
     - get: routing-release-ci
     - get: cf-deployment
       passed: [batman-deploy-cf]
       trigger: true
   - task: syslog-test
+    file: routing-release-ci/ci/tasks/syslog-test/task.yml
     input_mapping:
-      env: batman-env
-    config:
-      platform: linux
-      image_resource:
-        type: docker-image
-        source:
-          repository: cloudfoundry/cf-routing-pipeline
-      inputs:
-      - name: env
-      outputs:
-      - name: drats-integration-config
-      run:
-        path: bash
-        args:
-        - -c
-        - |
-          set -euo pipefail
-
-          function bosh_login() {
-            eval "$(cat env/metadata  | jq  '.bosh | with_entries( .key |= ascii_upcase) | to_entries[] | "export \(.key)='"'"'\(.value)'"'"'"' -r)"
-            export ENV_NAME=$(cat env/name)
-
-            key_path="$(mktemp -d)/$ENV_NAME.priv"
-            export BOSH_ALL_PROXY=${BOSH_ALL_PROXY/$ENV_NAME.priv/$key_path}
-            export BOSH_DEPLOYMENT="cf"
-            export CREDHUB_PROXY=$BOSH_ALL_PROXY
-            echo "$JUMPBOX_PRIVATE_KEY" > "${key_path}"
-            chmod 600 "${key_path}"
-            bosh -e "${BOSH_ENVIRONMENT}" --ca-cert <(echo "${BOSH_CA_CERT}") alias-env "${ENV_NAME}"
-            bosh login
-          }
-
-          bosh_login
-          function cleanup() {
-            pkill ssh || true
-          }
-          trap 'cleanup' EXIT
-
-          pushd $(mktemp -d)
-            set +x
-            cmd='sudo chmod a+w /var/vcap/store/syslog_storer/syslog.log; tail -n 100 /var/vcap/store/syslog_storer/syslog.log > /var/vcap/store/syslog_storer/syslog.log'
-            bosh ssh -c "$cmd" syslog_storer
-            sleep 60
-            bosh scp syslog_storer:/var/vcap/store/syslog_storer/syslog.log .
-            set -x
-            grep "$(date --utc --date '-1hour' +%Y-%m-%dT%H)\|$(date --utc +%Y-%m-%dT%H)" syslog.log | grep "routing-api" | tee routing-api.log
-            [ -s routing-api.log ] || (echo "Routing API logs are empty" && exit 1)
-            grep "$(date --utc --date '-1hour' +%Y-%m-%dT%H)\|$(date --utc +%Y-%m-%dT%H)" syslog.log | grep "gorouter" | tee gorouter.log
-            [ -s gorouter.log ] || (echo "Gorouter logs are empty" && exit 1)
-            grep "$(date --utc --date '-1hour' +%Y-%m-%dT%H)\|$(date --utc +%Y-%m-%dT%H)" syslog.log | grep "tcp_router" | tee tcp_router.log
-            [ -s tcp_router.log ] || (echo "TCP Router logs are empty" && exit 1)
-          popd
+      toolsmiths-metadata-dir: batman-env
 
 - name: batman-bosh-cleanup
   serial_groups: [batman]
