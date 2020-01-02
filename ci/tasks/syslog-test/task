@@ -4,7 +4,7 @@ set -eu -o pipefail
 source routing-release-ci/ci/scripts/script_helpers.sh
 
 if [[ -d toolsmiths-metadata-dir ]]; then
-  bosh_login_toolsmtihs toolsmiths-metadata-dir
+  bosh_login_toolsmiths toolsmiths-metadata-dir
 elif [[ -d deployments-routing ]]; then
   ENVIRONMENT="${ENVIRONMENT:?"ENVIRONMENT not set"}"
   bosh_login "${ENVIRONMENT}"
