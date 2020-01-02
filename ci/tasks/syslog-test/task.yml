@@ -9,7 +9,9 @@ image_resource:
 inputs:
 # either deployments-routing or toolsmiths-metadata-dir is required
 - name: deployments-routing
+  optional: true
 - name: toolsmiths-metadata-dir
+  optional: true
 
 - name: routing-release-ci
 
