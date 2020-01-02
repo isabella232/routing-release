@@ -28,6 +28,21 @@ function bosh_login() {
   fi
 }
 
+function bosh_login_toolsmiths() {
+  ENV=${1}
+  eval "$(cat ${ENV}/metadata  | jq  '.bosh | with_entries( .key |= ascii_upcase) | to_entries[] | "export \(.key)='"'"'\(.value)'"'"'"' -r)"
+  export ENV_NAME=$(cat ${ENV}/name)
+
+  key_path="$(mktemp -d)/$ENV_NAME.priv"
+  export BOSH_DEPLOYMENT="cf"
+  export BOSH_ALL_PROXY=${BOSH_ALL_PROXY/$ENV_NAME.priv/$key_path}
+  export CREDHUB_PROXY=$BOSH_ALL_PROXY
+  echo "$JUMPBOX_PRIVATE_KEY" > "${key_path}"
+  chmod 600 "${key_path}"
+  bosh -e "${BOSH_ENVIRONMENT}" --ca-cert <(echo "${BOSH_CA_CERT}") alias-env "${ENV_NAME}"
+  bosh login
+}
+
 function bosh_login_bosh_vars() {
   ENV=${1}
   BOSH_CLIENT_SECRET="$(bosh int "${DEPLOYMENT_DIR}/bosh-vars.yml" --path /admin_password)"
