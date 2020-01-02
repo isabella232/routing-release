@@ -3,8 +3,15 @@ set -eu -o pipefail
 
 source routing-release-ci/ci/scripts/script_helpers.sh
 
-ENVIRONMENT="${ENVIRONMENT:?"ENVIRONMENT not set"}"
-bosh_login "${ENVIRONMENT}"
+if [[ -d toolsmiths-metadata-dir ]]; then
+  ENVIRONMENT="${ENVIRONMENT:?"ENVIRONMENT not set"}"
+  bosh_login "${ENVIRONMENT}"
+elif [[ -d deployments-routing ]]; then
+  bosh_login_toolsmtihs toolsmiths-metadata-dir
+else
+  echo "Failed to provide either \"toolsmiths-metadata-dir\" or \"deployments-routing\""
+  exit 1
+fi
 
 function cleanup() {
   pkill ssh || true

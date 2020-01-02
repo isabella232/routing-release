@@ -7,11 +7,15 @@ image_resource:
     repository: cloudfoundry/cf-routing-pipeline
 
 inputs:
+# either deployments-routing or toolsmiths-metadata-dir is required
 - name: deployments-routing
+- name: toolsmiths-metadata-dir
+
 - name: routing-release-ci
 
 run:
   path: routing-release-ci/ci/tasks/syslog-test/task
 
 params:
+  #Required if the deployments-routing input is used
   ENVIRONMENT: batman
