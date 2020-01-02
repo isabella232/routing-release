@@ -1,6 +1,7 @@
 #!/bin/bash
 set -euo pipefail
 
+source routing-release-ci/ci/scripts/script_helpers.sh
 bosh_login_toolsmiths metadata-dir
 
 mkdir -p drats-config
