@@ -26,9 +26,6 @@ groups:
 
 - name: maintenance
   jobs:
-  - batman-destroy
-  - batman-bosh-cleanup
-  - batman-delete-deployment
   - diana-setup
   - diana-destroy
   - diana-cleanup
@@ -762,57 +759,6 @@ jobs:
     file: routing-release-ci/ci/tasks/syslog-test/task.yml
     input_mapping:
       toolsmiths-metadata-dir: batman-env
-
-- name: batman-bosh-cleanup
-  serial_groups: [batman]
-  plan:
-  - get: deployments-routing
-    passed: [batman-cats]
-    trigger: true
-  - get: cf-deployment-concourse-tasks
-  - task: cleanup-artifacts
-    file: cf-deployment-concourse-tasks/bosh-cleanup/task.yml
-    params:
-      BBL_STATE_DIR: batman/bbl-state
-    input_mapping:
-      bbl-state: deployments-routing
-
-- name: batman-destroy
-  serial_groups: [batman]
-  build_logs_to_retain: 100
-  plan:
-  - in_parallel:
-    - get: deployments-routing
-    - get: cf-deployment-concourse-tasks
-  - task: destroy-batman
-    file: cf-deployment-concourse-tasks/bbl-destroy/task.yml
-    params:
-      BBL_STATE_DIR: batman/bbl-state
-      BBL_GCP_SERVICE_ACCOUNT_KEY: ((shared_gcp_account_creds))
-      GIT_COMMIT_EMAIL: cf-routing-eng@pivotal.io
-    input_mapping:
-      bbl-state: deployments-routing
-    ensure:
-      put: deployments-routing
-      params:
-        repository: updated-bbl-state
-        rebase: true
-
-- name: batman-delete-deployment
-  serial_groups: [batman]
-  build_logs_to_retain: 100
-  plan:
-  - in_parallel:
-    - get: cf-deployment-concourse-tasks
-    - get: deployments-routing
-    - get: routing-release
-  - task: delete-cf-deployment
-    file: cf-deployment-concourse-tasks/bosh-delete-deployment/task.yml
-    input_mapping:
-      bbl-state: deployments-routing
-    params:
-      DEPLOYMENT_NAME: cf
-      BBL_STATE_DIR: batman/bbl-state
 
 - name: orinoco-http-perf-tests
   serial: true
