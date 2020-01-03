@@ -570,11 +570,6 @@ jobs:
         disable-blobstore-backup.yml
         create-indicator-protocol-uaa-client.yml
         ca_certs.yml
-  - task: create-isolation-segment
-    file: routing-release-ci/ci/tasks/create-isolation-segment/task.yml
-    params:
-      ENVIRONMENT: batman
-      ISO_SEG_NAME: "persistent_isolation_segment"
 
 - name: batman-cats
   serial_groups: [batman]
