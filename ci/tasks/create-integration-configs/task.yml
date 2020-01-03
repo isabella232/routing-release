@@ -8,7 +8,11 @@ image_resource:
 
 inputs:
   - name: routing-release-ci
+  # Must provide either deployments-routing OR toolsmiths-metadata-dir
   - name: deployments-routing
+    optional: true
+  - name: toolsmiths-metadata-dir
+    optional: true
   - name: cf-deployment-concourse-tasks
 
 outputs:
@@ -21,7 +25,7 @@ params:
   ISO_SEG_NAME:
   ISO_SEG_DOMAIN_PREFIX: iso-seg
   ENABLE_ISOLATION_SEGMENT_TESTS: true
-  ENVIRONMENT:
+  ENVIRONMENT: ''  # must be provided when using deployments-routing input
   VARS_STORE_FILE: deployment-vars.yml
   GIT_COMMIT_EMAIL: cf-routing-eng@pivotal.io
   GIT_COMMIT_USERNAME: "CI Bot"

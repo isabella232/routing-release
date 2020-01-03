@@ -6,7 +6,22 @@ set -e -o pipefail
 source cf-deployment-concourse-tasks/shared-functions
 source routing-release-ci/ci/scripts/script_helpers.sh
 
-SYSTEM_DOMAIN="${ENVIRONMENT}.routing.cf-app.com"
+if [[ -d toolsmiths-metadata-dir ]]; then
+  ENVIRONMENT=$(cat toolsmiths-metadata-dir/name)
+  API_URL=$(jq -r .cf.api_url toolsmiths-metadata-dir/metadata)
+  SYSTEM_DOMAIN=${API_URL#api.}
+  unset API_URL
+elif [[ -d deployments-routing ]]; then
+  if [[ ! -n "${ENVIRONMENT}" ]]; then
+    echo "Failed to specify \"ENVIRONMENT\" when using \"deployments-routing\""
+    exit 1
+  fi
+  SYSTEM_DOMAIN="${ENVIRONMENT}.routing.cf-app.com}"
+else
+  echo "Failed to provide either \"toolsmiths-metadata-dir\" or \"deployments-routing\""
+  exit 2
+fi
+
 CF_SMOKE_TESTS_CONFIG="${ENVIRONMENT}/cf_smoke_tests_config.json"
 CATS_INTEGRATION_CONFIG="${ENVIRONMENT}/cats_integration_config.json"
 RATS_INTEGRATION_CONFIG="${ENVIRONMENT}/rats_integration_config.json"
