@@ -582,17 +582,21 @@ jobs:
     - get: cf-deployment
       passed: [batman-cf-smoke-and-indicator-protocol-tests]
       trigger: true
-    - get: deployments-routing
-      passed: [batman-cf-smoke-and-indicator-protocol-tests]
     - get: cf-deployment-concourse-tasks
     - get: routing-release
       passed: [batman-cf-smoke-and-indicator-protocol-tests]
       trigger: true
+    - get: batman-env
+      passed:
+        - claim-batman
+      tags:
+      - vsphere-cf-networking
   - task: create-integration-config
     file: routing-release-ci/ci/tasks/create-integration-configs/task.yml
+    input_mapping:
+      toolsmiths-metadata-dir: batman-env
     params:
-      ENVIRONMENT: batman
-      ISO_SEG_NAME: "persistent_isolation_segment"
+      ISO_SEG_NAME: "shared"
   - task: update-integration-configs
     file: cf-deployment-concourse-tasks/update-integration-configs/task.yml
     input_mapping:
