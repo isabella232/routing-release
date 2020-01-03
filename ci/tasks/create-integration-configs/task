@@ -11,12 +11,14 @@ if [[ -d toolsmiths-metadata-dir ]]; then
   API_URL=$(jq -r .cf.api_url toolsmiths-metadata-dir/metadata)
   SYSTEM_DOMAIN=${API_URL#api.}
   unset API_URL
+  ADMIN_PASS=$(get_cf_admin_password_toolsmiths "${ENVIRONMENT}")
 elif [[ -d deployments-routing ]]; then
   if [[ ! -n "${ENVIRONMENT}" ]]; then
     echo "Failed to specify \"ENVIRONMENT\" when using \"deployments-routing\""
     exit 1
   fi
   SYSTEM_DOMAIN="${ENVIRONMENT}.routing.cf-app.com}"
+  ADMIN_PASS=$(extract_var "${ENVIRONMENT}" cf_admin_password)
 else
   echo "Failed to provide either \"toolsmiths-metadata-dir\" or \"deployments-routing\""
   exit 2
@@ -25,7 +27,6 @@ fi
 CF_SMOKE_TESTS_CONFIG="${ENVIRONMENT}/cf_smoke_tests_config.json"
 CATS_INTEGRATION_CONFIG="${ENVIRONMENT}/cats_integration_config.json"
 RATS_INTEGRATION_CONFIG="${ENVIRONMENT}/rats_integration_config.json"
-ADMIN_PASS=$(extract_var "${ENVIRONMENT}" cf_admin_password)
 
 pushd deployments-routing
   set_git_config
