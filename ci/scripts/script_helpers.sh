@@ -142,6 +142,23 @@ function bosh_logout ()
   unset CREDHUB_SECRET
 }
 
+function get_cf_admin_password_toolsmiths()
+{
+  local env="$1"
+
+  bosh_login_toolsmiths "$env"
+
+  credhub login \
+    --server='https://10.0.0.6:8844' \
+    --client-name='credhub-admin' \
+    --client-secret="${CREDHUB_SECRET}" \
+    --ca-cert="${CREDHUB_CA_CERT}"
+
+  credhub get \
+    --name="/bosh-${env}/cf/cf_admin_password" \
+    --quiet
+}
+
 function extract_var()
 {
   local env=${1}
