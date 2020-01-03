@@ -557,6 +557,7 @@ jobs:
     params:
       OPS_FILES: |
         use-compiled-releases.yml
+        scale-to-one-az.yml
         update_watch.yml
         syslog.yml
         routing_acceptance_tests.yml
