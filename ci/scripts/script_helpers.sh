@@ -29,9 +29,8 @@ function bosh_login() {
 }
 
 function bosh_login_toolsmiths() {
-  ENV=${1}
-  eval "$(cat ${ENV}/metadata  | jq  '.bosh | with_entries( .key |= ascii_upcase) | to_entries[] | "export \(.key)='"'"'\(.value)'"'"'"' -r)"
-  export ENV_NAME=$(cat ${ENV}/name)
+  eval "$(cat toolsmiths-metadata-dir/metadata | jq  '.bosh | with_entries( .key |= ascii_upcase) | to_entries[] | "export \(.key)='"'"'\(.value)'"'"'"' -r)"
+  export ENV_NAME=$(cat toolsmiths-metadata-dir/name)
 
   key_path="$(mktemp -d)/$ENV_NAME.priv"
   export BOSH_DEPLOYMENT="cf"

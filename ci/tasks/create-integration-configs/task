@@ -11,7 +11,7 @@ if [[ -d toolsmiths-metadata-dir ]]; then
   API_URL=$(jq -r .cf.api_url toolsmiths-metadata-dir/metadata)
   SYSTEM_DOMAIN=${API_URL#api.}
   unset API_URL
-  ADMIN_PASS=$(get_cf_admin_password_toolsmiths "${ENVIRONMENT}")
+  ADMIN_PASS=$(get_cf_admin_password_toolsmiths)
 elif [[ -d deployments-routing ]]; then
   if [[ ! -n "${ENVIRONMENT}" ]]; then
     echo "Failed to specify \"ENVIRONMENT\" when using \"deployments-routing\""
