@@ -143,7 +143,9 @@ function bosh_logout ()
 
 function get_cf_admin_password_toolsmiths()
 {
+  set -u
   local env="$1"
+  set +u
 
   bosh_login_toolsmiths "$env"
 
