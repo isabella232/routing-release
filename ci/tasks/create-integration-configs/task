@@ -28,7 +28,7 @@ CF_SMOKE_TESTS_CONFIG="${ENVIRONMENT}/cf_smoke_tests_config.json"
 CATS_INTEGRATION_CONFIG="${ENVIRONMENT}/cats_integration_config.json"
 RATS_INTEGRATION_CONFIG="${ENVIRONMENT}/rats_integration_config.json"
 
-mkdir created-integration-configs
+mkdir -p created-integration-configs
 
 pushd created-integration-configs
 
