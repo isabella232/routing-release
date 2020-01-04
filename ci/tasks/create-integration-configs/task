@@ -33,6 +33,7 @@ RATS_INTEGRATION_CONFIG='rats_integration_config.json'
 mkdir -p created-integration-configs
 
 pushd created-integration-configs
+  git init
 
   echo "Creating ${CATS_INTEGRATION_CONFIG}"
   cat > "${CATS_INTEGRATION_CONFIG}" <<EOF
