@@ -601,18 +601,17 @@ jobs:
   - task: update-integration-configs
     file: cf-deployment-concourse-tasks/update-integration-configs/task.yml
     input_mapping:
-      bbl-state: created-integration-configs
+      toolsmiths-env: batman-env
       integration-configs: created-integration-configs
     params:
-      BBL_STATE_DIR: batman/bbl-state
-      CATS_INTEGRATION_CONFIG_FILE: batman/cats_integration_config.json
+      CATS_INTEGRATION_CONFIG_FILE: cats_integration_config.json
       GIT_COMMIT_EMAIL: cf-routing-eng@pivotal.io
   - task: run-cats
     input_mapping:
       integration-config: updated-integration-configs
     file: cf-deployment-concourse-tasks/run-cats/task.yml
     params:
-      CONFIG_FILE_PATH: batman/cats_integration_config.json
+      CONFIG_FILE_PATH: cats_integration_config.json
 
 - name: batman-cf-smoke-and-indicator-protocol-tests
   serial_groups: [batman]
