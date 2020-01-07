@@ -147,13 +147,14 @@ function get_cf_admin_password_toolsmiths()
   local env="$1"
   set +u
 
-  bosh_login_toolsmiths "$env"
+  bosh_login_toolsmiths "$env" >&2
 
   credhub login \
     --server='https://10.0.0.6:8844' \
     --client-name='credhub-admin' \
     --client-secret="${CREDHUB_SECRET}" \
-    --ca-cert="${CREDHUB_CA_CERT}"
+    --ca-cert="${CREDHUB_CA_CERT}" \
+    >&2
 
   credhub get \
     --name="/bosh-${env}/cf/cf_admin_password" \
