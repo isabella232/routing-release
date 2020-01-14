@@ -561,10 +561,17 @@ jobs:
     file: cf-deployment-concourse-tasks/bosh-upload-stemcell-from-cf-deployment/task.yml
     input_mapping:
       toolsmiths-env: batman-env
+  - task: update-smoke-test-ops-file
+    file: routing-release-ci/ci/tasks/update-smoke-tests-ops-file/task.yml
+    input_mapping:
+      env-name: batman-env
   - task: merge-ops-files
     file: routing-release-ci/ci/tasks/merge-ops-files/task.yml
+    input_mapping:
+      source1: smoke-tests-ops-file
     params:
       ENVIRONMENT: batman
+      SOURCE1_DIR: ''
   - task: deploy-batman-with-created-routing
     file: cf-deployment-concourse-tasks/bosh-deploy-with-created-release/task.yml
     input_mapping:
