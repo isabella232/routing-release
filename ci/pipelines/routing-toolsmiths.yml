@@ -23,7 +23,8 @@ groups:
   - jubilee-no-downtime
   - promote-to-batman-passed
   - deliver-stories
-
+  - claim-cf-deployment
+  - batman-deploy-cf-using-toolsmith-base
 - name: maintenance
   jobs:
   - diana-setup
@@ -169,7 +170,7 @@ resources:
   type: git
   icon: github-box
   source:
-    branch: develop
+    branch: toolsmith-env-conversion-wip
     uri: git@github.com:cloudfoundry/routing-release.git
     private_key: ((github_private_key.private_key))
     paths:
@@ -224,9 +225,8 @@ resources:
   type: git
   icon: github-box
   source:
-    branch: brick-test
-    # uri: https://github.com/cloudfoundry/cf-deployment-concourse-tasks.git
-    uri: https://github.com/cf-routing/cf-deployment-concourse-tasks.git
+    branch: master
+    uri: https://github.com/cloudfoundry/cf-deployment-concourse-tasks.git
     # tag_filter: v10.*
 
 - name: cf-acceptance-tests
@@ -286,6 +286,16 @@ resources:
 
 #Toolsmith pool
 - name: batman-env
+  type: toolsmiths-envs
+  source:
+    api_token: ((toolsmiths_api_key))
+    sa_gcp_key: ((shared_gcp_account_creds))
+    pool_name: cf-deployment
+    hostname: environments.toolsmiths.cf-app.com
+  tags:
+  - vsphere-cf-networking
+
+- name: cf-deployment-env
   type: toolsmiths-envs
   source:
     api_token: ((toolsmiths_api_key))
@@ -487,6 +497,14 @@ jobs:
     tags:
     - vsphere-cf-networking
 
+- name: claim-cf-deployment
+  plan:
+  - put: cf-deployment-env
+    params:
+      action: claim
+    tags:
+    - vsphere-cf-networking
+
 - name: manual-unclaim-batman
   serial_groups: [batman]
   plan:
@@ -571,9 +589,101 @@ jobs:
         disable-blobstore-backup.yml
         create-indicator-protocol-uaa-client.yml
         ca_certs.yml
+        test/add-persistent-isolation-segment-router.yml
+        test/add-persistent-isolation-segment-diego-cell.yml
+        add-persistent-isolation-segment-router-ca-certs.yml
+
+- name: batman-deploy-cf-using-toolsmith-base
+  plan:
+  - in_parallel:
+    - get: cf-deployment-concourse-tasks
+    - get: cf-deployment
+    - get: deployments-routing
+    - get: routing-release
+      trigger: true
+      passed:
+      - routing-release-unit
+    - get: routing-release-ci
+      params: {submodules: none}
+    - get: cf-deployment-env
+      passed:
+        - claim-cf-deployment
+      tags:
+      - vsphere-cf-networking
+  - task: upload-stemcell
+    file: cf-deployment-concourse-tasks/bosh-upload-stemcell-from-cf-deployment/task.yml
+    input_mapping:
+      toolsmiths-env: cf-deployment-env
+  - task: update-smoke-test-ops-file
+    file: routing-release-ci/ci/tasks/update-smoke-tests-ops-file/task.yml
+    input_mapping:
+      env-name: cf-deployment-env
+  - task: merge-ops-files
+    file: routing-release-ci/ci/tasks/merge-ops-files/task.yml
+    input_mapping:
+      source1: smoke-tests-ops-file
+    params:
+      ENVIRONMENT: batman
+      SOURCE1_DIR: ''
+  - task: pull-our-envs-manifest
+    input_mapping:
+      toolsmiths-metadata-dir: cf-deployment-env
+    config:
+      platform: linux
+      image_resource:
+        type: docker-image
+        source:
+          repository: cloudfoundry/cf-routing-pipeline
+      inputs:
+      - name: toolsmiths-metadata-dir
+      - name: routing-release-ci
+      outputs:
+      - name: our-envs-manifest
+      run:
+        path: bash
+        args:
+          - -exc
+          - |
+            source routing-release-ci/ci/scripts/script_helpers.sh
+
+            bosh_login_toolsmiths
+
+            bosh -d cf manifest > our-envs-manifest/manifest.yml
+
+  - task: deploy-batman-with-created-routing
+    file: cf-deployment-concourse-tasks/bosh-deploy-with-created-release/task.yml
+    input_mapping:
+      toolsmiths-env: cf-deployment-env
+      release: routing-release
+      ops-files: merged-operations
+      vars-files: deployments-routing
+      cf-deployment: our-envs-manifest
+    params:
+      MANIFEST_FILE: manifest.yml
+      OPS_FILES: |
+        test/add-persistent-isolation-segment-diego-cell.yml
+        test/add-persistent-isolation-segment-router.yml
+        add-persistent-isolation-segment-router-ca-certs.yml
+        smoke_tests.yml
+
+# use-compiled-releases.yml
+# update_watch.yml
+# syslog.yml
+# routing_acceptance_tests.yml
+# routing_smoke_tests.yml
+# add-datadog-firehose-nozzle.yml
+# tls_pem.yml
+# xfcc.yml
+# backends_max_conns.yml
+# isolation_in_z3.yml
+# backup-and-restore/enable-backup-restore.yml
+# disable_bbr_non_routing.yml
+# disable-blobstore-backup.yml
+# enable_locket_isolated_diego.yml
+# create-indicator-protocol-uaa-client.yml
+# ca_certs.yml
 
 - name: batman-cats
-  serial_groups: [batman]
   build_logs_to_retain: 100
   plan:
   - in_parallel:
@@ -587,21 +697,21 @@ jobs:
     - get: routing-release
       passed: [batman-cf-smoke-and-indicator-protocol-tests]
       trigger: true
-    - get: batman-env
+    - get: cf-deployment-env
       passed:
-        - claim-batman
+        - batman-cf-smoke-and-indicator-protocol-tests
       tags:
       - vsphere-cf-networking
   - task: create-integration-config
     file: routing-release-ci/ci/tasks/create-integration-configs/task.yml
     input_mapping:
-      toolsmiths-metadata-dir: batman-env
+      toolsmiths-metadata-dir: cf-deployment-env
     params:
-      ISO_SEG_NAME: "shared"
+      ISO_SEG_NAME: "persistent_isolation_segment"
   - task: update-integration-configs
     file: cf-deployment-concourse-tasks/update-integration-configs/task.yml
     input_mapping:
-      toolsmiths-env: batman-env
+      toolsmiths-env: cf-deployment-env
       integration-configs: created-integration-configs
     params:
       CATS_INTEGRATION_CONFIG_FILE: cats_integration_config.json
@@ -614,40 +724,39 @@ jobs:
       CONFIG_FILE_PATH: cats_integration_config.json
 
 - name: batman-cf-smoke-and-indicator-protocol-tests
-  serial_groups: [batman]
   plan:
   - in_parallel:
     - get: routing-release
-      passed: [batman-deploy-cf]
+      passed: [batman-deploy-cf-using-toolsmith-base]
       trigger: true
     - get: routing-release-ci
       params: {submodules: none}
     - get: cf-deployment-concourse-tasks
     - get: deployments-routing
-      passed: [batman-deploy-cf]
+      passed: [batman-deploy-cf-using-toolsmith-base]
     - get: cf-smoke-tests-release
     - get: cf-deployment
-      passed: [batman-deploy-cf]
+      passed: [batman-deploy-cf-using-toolsmith-base]
       trigger: true
     - get: indicator-protocol-release
       params:
         globs:
         - indicator-verification-linux64*
-    - get: batman-env
+    - get: cf-deployment-env
       passed:
-        - claim-batman
+        - batman-deploy-cf-using-toolsmith-base
       tags:
       - vsphere-cf-networking
   - task: create-integration-config
     file: routing-release-ci/ci/tasks/create-integration-configs/task.yml
     input_mapping:
-      toolsmiths-metadata-dir: batman-env
+      toolsmiths-metadata-dir: cf-deployment-env
     params:
-      ISO_SEG_NAME: "shared"
+      ISO_SEG_NAME: "persistent_isolation_segment"
   - task: update-integration-configs
     file: cf-deployment-concourse-tasks/update-integration-configs/task.yml
     input_mapping:
-      toolsmiths-env: batman-env
+      toolsmiths-env: cf-deployment-env
       integration-configs: created-integration-configs
     params:
       CATS_INTEGRATION_CONFIG_FILE: cats_integration_config.json
@@ -655,10 +764,11 @@ jobs:
   - task: run-cf-smoke-tests
     file: cf-deployment-concourse-tasks/run-errand/task.yml
     input_mapping:
-      toolsmiths-env: batman-env
+      toolsmiths-env: cf-deployment-env
     params:
       DEPLOYMENT_NAME: cf
       ERRAND_NAME: smoke-tests
+      KEEP_ALIVE: true
 
 
 - name: batman-drats
@@ -715,7 +825,6 @@ jobs:
 #       DEFAULT_TIMEOUT_MINS: 90
 
 - name: batman-rats
-  serial_groups: [batman]
   build_logs_to_retain: 100
   plan:
   - timeout: 4h
@@ -732,25 +841,27 @@ jobs:
         passed: [batman-cf-smoke-and-indicator-protocol-tests]
         trigger: true
       - get: cf-deployment-concourse-tasks
+      - get: cf-deployment-env
+        passed: [batman-cf-smoke-and-indicator-protocol-tests]
     - task: create-integration-config
       file: routing-release-ci/ci/tasks/create-integration-configs/task.yml
+      input_mapping:
+        toolsmiths-metadata-dir: cf-deployment-env
       params:
-        ENVIRONMENT: batman
         ISO_SEG_NAME: "persistent_isolation_segment"
     - task: update-integration-configs
       file: cf-deployment-concourse-tasks/update-integration-configs/task.yml
       input_mapping:
-        bbl-state: created-integration-configs
+        toolsmiths-env: cf-deployment-env
         integration-configs: created-integration-configs
       params:
-        BBL_STATE_DIR: batman/bbl-state
-        RATS_INTEGRATION_CONFIG_FILE: batman/rats_integration_config.json
+        RATS_INTEGRATION_CONFIG_FILE: rats_integration_config.json
         GIT_COMMIT_EMAIL: cf-routing-eng@pivotal.io
     - task: run-rats
       input_mapping:
         integration-config: updated-integration-configs
       params:
-        CONFIG_FILE_PATH: batman/rats_integration_config.json
+        CONFIG_FILE_PATH: rats_integration_config.json
         GINKGO_ARGS: "-v"
       file: routing-release-ci/ci/tasks/run-rats/task.yml
 
