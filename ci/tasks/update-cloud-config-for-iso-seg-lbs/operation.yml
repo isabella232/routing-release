@@ -1,0 +1,2 @@
+- type: remove
+  path: /vm_extensions/name=iso-seg-cf-router-network-properties/cloud_properties/backend_service
