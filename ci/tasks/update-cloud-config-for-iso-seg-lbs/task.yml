@@ -11,4 +11,4 @@ inputs:
 - name: routing-release-ci
 
 run:
-  path: routing-release-ci/ci/tasks/update-cloud-config-for-isolation-segment-lbs
+  path: routing-release-ci/ci/tasks/update-cloud-config-for-isolation-segment-lbs/task
