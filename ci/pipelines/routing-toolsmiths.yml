@@ -557,10 +557,6 @@ jobs:
         - claim-batman
       tags:
       - vsphere-cf-networking
-  - task: upload-stemcell
-    file: cf-deployment-concourse-tasks/bosh-upload-stemcell-from-cf-deployment/task.yml
-    input_mapping:
-      toolsmiths-env: batman-env
   - task: update-smoke-test-ops-file
     file: routing-release-ci/ci/tasks/update-smoke-tests-ops-file/task.yml
     input_mapping:
@@ -617,10 +613,6 @@ jobs:
         - claim-cf-deployment
       tags:
       - vsphere-cf-networking
-  - task: upload-stemcell
-    file: cf-deployment-concourse-tasks/bosh-upload-stemcell-from-cf-deployment/task.yml
-    input_mapping:
-      toolsmiths-env: cf-deployment-env
   - task: update-smoke-test-ops-file
     file: routing-release-ci/ci/tasks/update-smoke-tests-ops-file/task.yml
     input_mapping:
