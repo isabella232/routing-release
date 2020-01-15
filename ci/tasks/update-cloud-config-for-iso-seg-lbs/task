@@ -11,9 +11,11 @@ bosh -d cf cloud-config > cloud-config.yml
 # note: we are not operating on a bosh manifest
 # just using "bosh interpolate" and "ops files"
 # to edit a yml file automatically
+OPS_FILE='routing-release-ci/ci/tasks/update-cloud-config-for-iso-seg-lbs/operation.yml'
+
 bosh interpolate \
      cloud-config.yml \
-     --ops-file=operation.yml \
+     --ops-file="${OPS_FILE}" \
      > updated-cloud-config.yml
 
 bosh update-cloud-config \
