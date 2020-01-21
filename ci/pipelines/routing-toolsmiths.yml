@@ -628,10 +628,6 @@ jobs:
     file: routing-release-ci/ci/tasks/fetch-toolsmiths-manifest/task.yml
     input_mapping:
       toolsmiths-metadata-dir: cf-deployment-env
-  - task: update-cloud-config-for-isolation-segment-lbs
-    file: routing-release-ci/ci/tasks/update-cloud-config-for-iso-seg-lbs/task.yml
-    input_mapping:
-      toolsmiths-metadata-dir: cf-deployment-env
   - task: deploy-batman-with-created-routing
     file: cf-deployment-concourse-tasks/bosh-deploy-with-created-release/task.yml
     input_mapping:
