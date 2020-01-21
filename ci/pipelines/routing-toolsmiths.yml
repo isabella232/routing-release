@@ -9,7 +9,6 @@ groups:
   - claim-batman
   - manual-unclaim-batman
   - unclaim-batman
-  - batman-deploy-cf
   - batman-syslog-test
   - batman-cf-smoke-and-indicator-protocol-tests
   - batman-rats
@@ -538,64 +537,6 @@ jobs:
       tags:
         - vsphere-cf-networking
 
-- name: batman-deploy-cf
-  serial_groups: [batman]
-  plan:
-  - in_parallel:
-    - get: cf-deployment-concourse-tasks
-    - get: cf-deployment
-      trigger: true
-    - get: deployments-routing
-    - get: routing-release
-      trigger: true
-      passed:
-      - routing-release-unit
-    - get: routing-release-ci
-      params: {submodules: none}
-    - get: batman-env
-      passed:
-        - claim-batman
-      tags:
-      - vsphere-cf-networking
-  - task: update-smoke-test-ops-file
-    file: routing-release-ci/ci/tasks/update-smoke-tests-ops-file/task.yml
-    input_mapping:
-      env-name: batman-env
-  - task: merge-ops-files
-    file: routing-release-ci/ci/tasks/merge-ops-files/task.yml
-    input_mapping:
-      source1: smoke-tests-ops-file
-    params:
-      ENVIRONMENT: batman
-      SOURCE1_DIR: ''
-  - task: deploy-batman-with-created-routing
-    file: cf-deployment-concourse-tasks/bosh-deploy-with-created-release/task.yml
-    input_mapping:
-      toolsmiths-env: batman-env
-      release: routing-release
-      ops-files: merged-operations
-      vars-files: deployments-routing
-    params:
-      OPS_FILES: |
-        use-compiled-releases.yml
-        scale-to-one-az.yml
-        update_watch.yml
-        syslog.yml
-        routing_acceptance_tests.yml
-        routing_smoke_tests.yml
-        tls_pem.yml
-        smoke_tests.yml
-        xfcc.yml
-        backends_max_conns.yml
-        backup-and-restore/enable-backup-restore.yml
-        disable_bbr_non_routing.yml
-        disable-blobstore-backup.yml
-        create-indicator-protocol-uaa-client.yml
-        ca_certs.yml
-        test/add-persistent-isolation-segment-router.yml
-        test/add-persistent-isolation-segment-diego-cell.yml
-        add-persistent-isolation-segment-router-ca-certs.yml
-
 - name: batman-deploy-cf-using-toolsmith-base
   plan:
   - in_parallel:
@@ -662,6 +603,8 @@ jobs:
 # ca_certs.yml
 
 - name: batman-cats
+  serial_groups:
+    - batman
   build_logs_to_retain: 100
   plan:
   - in_parallel:
@@ -756,7 +699,7 @@ jobs:
     tags:
     - vsphere-cf-networking
   - get: routing-release
-    passed: [batman-deploy-cf]
+    passed: [batman-deploy-cf-using-toolsmith-base]
     trigger: true
   - get: routing-release-ci
     params: {submodules: none}
@@ -764,7 +707,7 @@ jobs:
   - get: disaster-recovery-acceptance-tests
   - get: cf-deployment
     trigger: true
-    passed: [batman-deploy-cf]
+    passed: [batman-deploy-cf-using-toolsmith-base]
   - task: create-drats-config
     file: routing-release-ci/ci/tasks/create-drats-config-toolsmiths/task.yml
     input_mapping:
@@ -803,6 +746,8 @@ jobs:
 #       DEFAULT_TIMEOUT_MINS: 90
 
 - name: batman-rats
+  serial_groups:
+    - batman
   build_logs_to_retain: 100
   plan:
   - timeout: 4h
@@ -851,12 +796,12 @@ jobs:
       tags:
       - vsphere-cf-networking
     - get: routing-release
-      passed: [batman-deploy-cf]
+      passed: [batman-deploy-cf-using-toolsmith-base]
       trigger: true
     - get: routing-release-ci
       params: {submodules: none}
     - get: cf-deployment
-      passed: [batman-deploy-cf]
+      passed: [batman-deploy-cf-using-toolsmith-base]
       trigger: true
   - task: syslog-test
     file: routing-release-ci/ci/tasks/syslog-test/task.yml
