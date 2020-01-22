@@ -6,9 +6,6 @@ groups:
   - upgrade-cf-cli-in-routing-release
   - upgrade-dep-dependencies-in-routing-perf-release
   - routing-release-unit
-  - claim-batman
-  - manual-unclaim-batman
-  - unclaim-batman
   - batman-syslog-test
   - batman-cf-smoke-and-indicator-protocol-tests
   - batman-rats
@@ -23,6 +20,7 @@ groups:
   - promote-to-batman-passed
   - deliver-stories
   - claim-cf-deployment
+  - manual-unclaim-cf-deployment
   - batman-deploy-cf-using-toolsmith-base
 - name: maintenance
   jobs:
@@ -487,15 +485,6 @@ jobs:
         rebase: true
 
 # INFRASTRUCTURE - batman
-- name: claim-batman
-  serial_groups: [batman]
-  plan:
-  - put: batman-env
-    params:
-      action: claim
-    tags:
-    - vsphere-cf-networking
-
 - name: claim-cf-deployment
   plan:
   - put: cf-deployment-env
@@ -504,36 +493,17 @@ jobs:
     tags:
     - vsphere-cf-networking
 
-- name: manual-unclaim-batman
-  serial_groups: [batman]
+- name: manual-unclaim-cf-deployment
   plan:
-    - get: batman-env
+    - get: cf-deployment-env
       passed:
-        - claim-batman
+        - claim-cf-deployment
       tags:
         - vsphere-cf-networking
-    - put: batman-env
+    - put: cf-deployment-env
       params:
         action: unclaim
-        env_file: batman-env/metadata
-      tags:
-        - vsphere-cf-networking
-
-
-- name: unclaim-batman
-  serial_groups: [batman]
-  plan:
-    - get: batman-env
-      passed:
-        # - run-cats
-        # - run-drats
-        # - run-rats
-      tags:
-        - vsphere-cf-networking
-    - put: batman-env
-      params:
-        action: unclaim
-        env_file: batman-env/metadata
+        env_file: cf-deployment-env/metadata
       tags:
         - vsphere-cf-networking
 
