@@ -8,7 +8,7 @@ image_resource:
 
 inputs:
   - name: routing-release-ci
-  - name: metadata-dir
+  - name: toolsmiths-metadata-dir
 
 outputs:
   - name: drats-integration-config

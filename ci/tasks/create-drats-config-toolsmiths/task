@@ -2,14 +2,14 @@
 set -euo pipefail
 
 source routing-release-ci/ci/scripts/script_helpers.sh
-bosh_login_toolsmiths metadata-dir
+bosh_login_toolsmiths toolsmiths-metadata-dir
 
 mkdir -p drats-config
 
 ssh_proxy_host=$(python2 -c "from urlparse import urlparse; print(urlparse('$BOSH_ALL_PROXY').hostname)")
 
 jq -n \
-  --arg cf_api_url "https://$(jq -r '.cf.api_url' < metadata-dir/metadata)" \
+  --arg cf_api_url "https://$(jq -r '.cf.api_url' < toolsmiths-metadata-dir/metadata)" \
   --arg cf_deployment_name "cf" \
   --arg cf_admin_username "admin" \
   --arg cf_admin_password "$(credhub get -j -n /bosh-${ENV_NAME}/cf/cf_admin_password | jq -r .value)" \
