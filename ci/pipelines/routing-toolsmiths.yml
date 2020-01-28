@@ -282,16 +282,6 @@ resources:
     tracker_url: https://www.pivotaltracker.com
 
 #Toolsmith pool
-- name: batman-env
-  type: toolsmiths-envs
-  source:
-    api_token: ((toolsmiths_api_key))
-    sa_gcp_key: ((shared_gcp_account_creds))
-    pool_name: cf-deployment
-    hostname: environments.toolsmiths.cf-app.com
-  tags:
-  - vsphere-cf-networking
-
 - name: cf-deployment-env
   type: toolsmiths-envs
   source:
@@ -665,23 +655,24 @@ jobs:
 - name: batman-drats
   serial_groups: [batman]
   plan:
-  - get: batman-env
-    tags:
-    - vsphere-cf-networking
-  - get: routing-release
-    passed: [batman-deploy-cf-using-toolsmith-base]
-    trigger: true
-  - get: routing-release-ci
-    params: {submodules: none}
-  - get: bbr-binary-release
-  - get: disaster-recovery-acceptance-tests
-  - get: cf-deployment
-    trigger: true
-    passed: [batman-deploy-cf-using-toolsmith-base]
+  - in_parallel:
+    - get: cf-deployment-env
+      tags:
+      - vsphere-cf-networking
+    - get: routing-release
+      passed: [batman-deploy-cf-using-toolsmith-base]
+      trigger: true
+    - get: routing-release-ci
+      params: {submodules: none}
+    - get: bbr-binary-release
+    - get: disaster-recovery-acceptance-tests
+    - get: cf-deployment
+      trigger: true
+      passed: [batman-deploy-cf-using-toolsmith-base]
   - task: create-drats-config
     file: routing-release-ci/ci/tasks/create-drats-config-toolsmiths/task.yml
     input_mapping:
-      metadata-dir: batman-env
+      toolsmiths-metadata-dir: cf-deployment-env
   - task: run-disaster-recovery-acceptance-tests
     file: disaster-recovery-acceptance-tests/ci/drats-with-integration-config/task.yml
     privileged: true
@@ -764,7 +755,7 @@ jobs:
   serial_groups: [batman]
   plan:
   - in_parallel:
-    - get: batman-env
+    - get: cf-deployment-env
       tags:
       - vsphere-cf-networking
     - get: routing-release
@@ -778,7 +769,7 @@ jobs:
   - task: syslog-test
     file: routing-release-ci/ci/tasks/syslog-test/task.yml
     input_mapping:
-      toolsmiths-metadata-dir: batman-env
+      toolsmiths-metadata-dir: cf-deployment-env
 
 - name: orinoco-http-perf-tests
   serial: true
