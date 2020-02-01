@@ -1,10 +1,13 @@
 #!/bin/bash
-set -eux -o pipefail
+set -ex -o pipefail
 
-source routing-release-ci/ci/scripts/script_helpers.sh
+if [[ -z "${ENVIRONMENT_NAME}" ]]; do
 
 URL="https://environments.toolsmiths.cf-app.com/pooled_gcp_engineering_environments/claim?api_token=$TOOLSMITHS_API_TOKEN&pool_name=${ENVIRONMENT_TYPE}&notes=${ENVIRONMENT_NOTES}"
 
 curl -X POST "${URL}" > cf-environment/metadata
+else
+    smith read -e "${ENVIRONMENT_NAME}" > cf-environment/metadata
+fi
 
 jq -r .name cf-environment/metadata | tee cf-environment/name
