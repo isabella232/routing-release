@@ -13,7 +13,7 @@ outputs:
 
 params:
   ENVIRONMENT_TYPE: cf-deployment
-  TOOLSMITHS_API_KEY:
+  TOOLSMITHS_API_TOKEN:
   ENVIRONMENT_NOTES:
 
 run:
