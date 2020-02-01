@@ -1,0 +1,12 @@
+#!/bin/bash
+set -e -o pipefail
+
+source routing-release-ci/ci/scripts/script_helpers.sh
+
+curl -X POST
+
+URL="https://environments.toolsmiths.cf-app.com/pooled_gcp_engineering_environments/claim?api_token=$TOOLSMITHS_API_TOKEN&pool_name=${ENVIRONMENT_TYPE}&notes=${ENVIRONMENT_NOTES}"
+
+curl -X POST "${URL}" > cf-environment/metadata
+
+jq -r .name cf-environment/metadata > cf-environment/name
