@@ -517,35 +517,7 @@ jobs:
   - task: write-lb-cert-to-credhub
     input_mapping:
       toolsmiths-metadata-dir: cf-deployment-env
-    config:
-      platform: linux
-      image_resource:
-        type: docker-image
-        source:
-          repository: cloudfoundry/cf-routing-pipeline
-      inputs:
-        - name: routing-release-ci
-        - name: toolsmiths-metadata-dir
-      run:
-        path: bash
-        args:
-          - -exc
-          - |
-            set -eux
-          
-            echo $PWD
-            source routing-release-ci/ci/scripts/script_helpers.sh
-
-            bosh_login_toolsmiths
-
-            ENV_NAME=$(cat toolsmiths-metadata-dir/name)
-            CERT_FILE=$(mktemp)
-            openssl s_client -showcerts -connect any.${ENV_NAME}.cf-app.com:443 </dev/null 2>/dev/null | openssl x509 > $CERT_FILE
-            credhub set \
-              --name /bosh-${ENV_NAME}/cf/lb_cert \
-              --type certificate \
-              --certificate ${CERT_FILE}
-
+    file: routing-release-ci/ci/tasks/write-lb-cert-to-credhub/task.yml
   - task: update-smoke-test-ops-file
     file: routing-release-ci/ci/tasks/update-smoke-tests-ops-file/task.yml
     input_mapping:
