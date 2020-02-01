@@ -1,11 +1,11 @@
 #!/bin/bash
 set -ex -o pipefail
 
-if [[ -z "${ENVIRONMENT_NAME}" ]]; do
+if [[ -z "${ENVIRONMENT_NAME}" ]]; then
 
-URL="https://environments.toolsmiths.cf-app.com/pooled_gcp_engineering_environments/claim?api_token=$TOOLSMITHS_API_TOKEN&pool_name=${ENVIRONMENT_TYPE}&notes=${ENVIRONMENT_NOTES}"
+    URL="https://environments.toolsmiths.cf-app.com/pooled_gcp_engineering_environments/claim?api_token=$TOOLSMITHS_API_TOKEN&pool_name=${ENVIRONMENT_TYPE}&notes=${ENVIRONMENT_NOTES}"
 
-curl -X POST "${URL}" > cf-environment/metadata
+    curl -X POST "${URL}" > cf-environment/metadata
 else
     smith read -e "${ENVIRONMENT_NAME}" > cf-environment/metadata
 fi
