@@ -7,4 +7,4 @@ URL="https://environments.toolsmiths.cf-app.com/pooled_gcp_engineering_environme
 
 curl -X POST "${URL}" > cf-environment/metadata
 
-jq -r .name cf-environment/metadata > cf-environment/name
+jq -r .name cf-environment/metadata | tee cf-environment/name
