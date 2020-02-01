@@ -7,8 +7,6 @@ if [[ -z "${ENVIRONMENT_NAME}" ]]; then
 
     curl -X POST "${URL}" > cf-environment/metadata
 else
-    smith read -e "${ENVIRONMENT_NAME}" > cf-environment/metadata
-
     URL="https://environments.toolsmiths.cf-app.com/pooled_gcp_engineering_environments/claim?api_token=$TOOLSMITHS_API_TOKEN&environment_name=${ENRIRONMENT_NAME}"
     
     curl ${URL} > cf-environment/metadata
