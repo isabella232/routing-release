@@ -659,7 +659,6 @@ jobs:
         test/add-persistent-isolation-segment-diego-cell.yml
         test/add-persistent-isolation-segment-router.yml
         add-persistent-isolation-segment-router-ca-certs.yml
-        smoke_tests.yml
         add-lb-ca-cert.yml
         use-compiled-releases.yml
   - task: create-integration-config
