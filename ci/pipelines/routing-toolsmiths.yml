@@ -616,6 +616,7 @@ jobs:
     - get: routing-release-ci
       params: {submodules: none}
     - get: cf-acceptance-tests
+    - get: deployments-routing	
     - get: cf-deployment
       trigger: true
     - get: cf-deployment-concourse-tasks
