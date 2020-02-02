@@ -11,6 +11,7 @@ groups:
   - batman-rats
   - batman-cats
   - batman-drats
+  - cf-deployment-cats
   - orinoco-http-perf-tests
   - diana-tcp-perf-tests
   - ci-lite-deploy-cf
@@ -609,6 +610,79 @@ jobs:
     params:
       CONFIG_FILE_PATH: cats_integration_config.json
 
+- name: cf-deployment-cats
+  plan:
+  - in_parallel:
+    - get: routing-release-ci
+      params: {submodules: none}
+    - get: cf-acceptance-tests
+    - get: cf-deployment
+      trigger: true
+    - get: cf-deployment-concourse-tasks
+    - get: routing-release
+      trigger: true
+  - task: claim-cf-deployment-environment
+    file: routing-release-ci/ci/tasks/claim-cf-deployment-environment/task.yml
+    tags:
+    - vsphere-cf-networking
+    params:
+      ENVIRONMENT_TYPE: cf-deployment
+      ENVIRONMENT_NOTES: cf-deployment-cats
+      TOOLSMITHS_API_TOKEN: 9721e931-4f01-401f-ab7b-a46bf78a6054
+  - task: write-lb-cert-to-credhub
+    input_mapping:
+      toolsmiths-metadata-dir: cf-environment
+    file: routing-release-ci/ci/tasks/write-lb-cert-to-credhub/task.yml
+# - task: merge-ops-files
+#   file: routing-release-ci/ci/tasks/merge-ops-files/task.yml
+#   input_mapping:
+#     source1: smoke-tests-ops-file
+#   params:
+#     ENVIRONMENT: batman
+#     SOURCE1_DIR: ''
+  - task: fetch-our-envs-manifest
+    file: routing-release-ci/ci/tasks/fetch-toolsmiths-manifest/task.yml
+    input_mapping:
+      toolsmiths-metadata-dir: cf-environment
+  - task: deploy-batman-with-created-routing
+    file: cf-deployment-concourse-tasks/bosh-deploy-with-created-release/task.yml
+    input_mapping:
+      toolsmiths-env: cf-environment
+      release: routing-release
+      ops-files: merged-operations
+      vars-files: deployments-routing
+      cf-deployment: our-envs-manifest
+    params:
+      MANIFEST_FILE: manifest.yml
+      OPS_FILES: |
+        test/add-persistent-isolation-segment-diego-cell.yml
+        test/add-persistent-isolation-segment-router.yml
+        add-persistent-isolation-segment-router-ca-certs.yml
+        smoke_tests.yml
+        add-lb-ca-cert.yml
+        use-compiled-releases.yml
+  - task: create-integration-config
+    file: routing-release-ci/ci/tasks/create-integration-configs/task.yml
+    input_mapping:
+      toolsmiths-metadata-dir: cf-environment
+    params:
+      ISO_SEG_NAME: "persistent_isolation_segment"
+  - task: update-integration-configs
+    file: cf-deployment-concourse-tasks/update-integration-configs/task.yml
+    input_mapping:
+      toolsmiths-env: cf-environment
+      integration-configs: created-integration-configs
+    params:
+      CATS_INTEGRATION_CONFIG_FILE: cats_integration_config.json
+      GIT_COMMIT_EMAIL: cf-routing-eng@pivotal.io
+  - task: run-cats
+    input_mapping:
+      integration-config: updated-integration-configs
+    file: cf-deployment-concourse-tasks/run-cats/task.yml
+    params:
+      CONFIG_FILE_PATH: cats_integration_config.json
+
+
 - name: batman-cf-smoke-and-indicator-protocol-tests
   plan:
   - in_parallel:
@@ -633,6 +707,26 @@ jobs:
         - batman-deploy-cf-using-toolsmith-base
       tags:
       - vsphere-cf-networking
+  - task: fetch-our-envs-manifest
+    file: routing-release-ci/ci/tasks/fetch-toolsmiths-manifest/task.yml
+    input_mapping:
+      toolsmiths-metadata-dir: cf-deployment-env
+  - task: deploy-batman-with-created-routing
+    file: cf-deployment-concourse-tasks/bosh-deploy-with-created-release/task.yml
+    input_mapping:
+      toolsmiths-env: cf-deployment-env
+      release: routing-release
+      ops-files: merged-operations
+      vars-files: deployments-routing
+      cf-deployment: our-envs-manifest
+    params:
+      MANIFEST_FILE: manifest.yml
+      OPS_FILES: |
+        test/add-persistent-isolation-segment-diego-cell.yml
+        test/add-persistent-isolation-segment-router.yml
+        add-persistent-isolation-segment-router-ca-certs.yml
+        add-lb-ca-cert.yml
+        use-compiled-releases.yml
   - task: create-integration-config
     file: routing-release-ci/ci/tasks/create-integration-configs/task.yml
     input_mapping:
