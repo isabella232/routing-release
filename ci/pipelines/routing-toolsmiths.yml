@@ -549,9 +549,11 @@ jobs:
         test/add-persistent-isolation-segment-diego-cell.yml
         test/add-persistent-isolation-segment-router.yml
         add-persistent-isolation-segment-router-ca-certs.yml
+        backup-and-restore/enable-backup-restore.yml
         smoke_tests.yml
         add-lb-ca-cert.yml
         use-compiled-releases.yml
+
 
 # update_watch.yml
 # syslog.yml
@@ -562,7 +564,6 @@ jobs:
 # xfcc.yml
 # backends_max_conns.yml
 # isolation_in_z3.yml
-# backup-and-restore/enable-backup-restore.yml
 # disable_bbr_non_routing.yml
 # disable-blobstore-backup.yml
 # enable_locket_isolated_diego.yml
@@ -619,7 +620,6 @@ jobs:
     - get: cf-acceptance-tests
     - get: deployments-routing	
     - get: cf-deployment
-      trigger: true
     - get: cf-deployment-concourse-tasks
     - get: routing-release
       trigger: true
