@@ -630,17 +630,18 @@ jobs:
       ENVIRONMENT_TYPE: cf-deployment
       ENVIRONMENT_NOTES: cf-deployment-cats
       TOOLSMITHS_API_TOKEN: 9721e931-4f01-401f-ab7b-a46bf78a6054
+# ENVIRONMENT_NAME: verypaleorange
   - task: write-lb-cert-to-credhub
     input_mapping:
       toolsmiths-metadata-dir: cf-environment
     file: routing-release-ci/ci/tasks/write-lb-cert-to-credhub/task.yml
-# - task: merge-ops-files
-#   file: routing-release-ci/ci/tasks/merge-ops-files/task.yml
-#   input_mapping:
-#     source1: smoke-tests-ops-file
-#   params:
-#     ENVIRONMENT: batman
-#     SOURCE1_DIR: ''
+  - task: merge-ops-files
+    file: routing-release-ci/ci/tasks/merge-ops-files/task.yml
+    input_mapping:
+      source1: smoke-tests-ops-file
+    params:
+      ENVIRONMENT: batman
+      SOURCE1_DIR: ''
   - task: fetch-our-envs-manifest
     file: routing-release-ci/ci/tasks/fetch-toolsmiths-manifest/task.yml
     input_mapping:
@@ -651,7 +652,7 @@ jobs:
       toolsmiths-env: cf-environment
       release: routing-release
       ops-files: merged-operations
-      vars-files: deployments-routing
+      vars-files: routing-release
       cf-deployment: our-envs-manifest
     params:
       MANIFEST_FILE: manifest.yml
@@ -661,6 +662,7 @@ jobs:
         add-persistent-isolation-segment-router-ca-certs.yml
         add-lb-ca-cert.yml
         use-compiled-releases.yml
+        scale_for_cats.yml
   - task: create-integration-config
     file: routing-release-ci/ci/tasks/create-integration-configs/task.yml
     input_mapping:
