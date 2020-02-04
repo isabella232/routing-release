@@ -12,6 +12,7 @@ groups:
   - batman-cats
   - batman-drats
   - cf-deployment-cats
+  - cf-deployment-drats
   - orinoco-http-perf-tests
   - diana-tcp-perf-tests
   - ci-lite-deploy-cf
@@ -780,6 +781,62 @@ jobs:
     params:
       CONFIG_FILE_PATH: drats_integration_config.json
       DEFAULT_TIMEOUT_MINS: 90
+
+- name: cf-deployment-drats
+  plan:
+  - in_parallel:
+    - get: routing-release
+      trigger: true
+    - get: routing-release-ci
+      params: {submodules: none}
+    - get: bbr-binary-release
+    - get: disaster-recovery-acceptance-tests
+    - get: cf-deployment
+    - get: deployments-routing
+    - get: cf-deployment-concourse-tasks
+  - task: claim-cf-deployment-environment
+    file: routing-release-ci/ci/tasks/claim-cf-deployment-environment/task.yml
+    tags:
+    - vsphere-cf-networking
+    params:
+      ENVIRONMENT_TYPE: cf-deployment
+      ENVIRONMENT_NOTES: cf-deployment-cats
+      TOOLSMITHS_API_TOKEN: 9721e931-4f01-401f-ab7b-a46bf78a6054
+  - task: merge-ops-files
+    file: routing-release-ci/ci/tasks/merge-ops-files/task.yml
+    input_mapping:
+      source1: smoke-tests-ops-file
+    params:
+      ENVIRONMENT: batman
+      SOURCE1_DIR: ''
+  - task: fetch-our-envs-manifest
+    file: routing-release-ci/ci/tasks/fetch-toolsmiths-manifest/task.yml
+    input_mapping:
+      toolsmiths-metadata-dir: cf-environment
+  - task: deploy-batman-with-created-routing
+    file: cf-deployment-concourse-tasks/bosh-deploy-with-created-release/task.yml
+    input_mapping:
+      toolsmiths-env: cf-environment
+      release: routing-release
+      ops-files: merged-operations
+      vars-files: routing-release
+      cf-deployment: our-envs-manifest
+    params:
+      MANIFEST_FILE: manifest.yml
+      OPS_FILES: |
+        use-compiled-releases.yml
+        backup-and-restore/enable-backup-restore.yml
+  - task: create-drats-config
+    file: routing-release-ci/ci/tasks/create-drats-config-toolsmiths/task.yml
+    input_mapping:
+      toolsmiths-metadata-dir: cf-environment
+  - task: run-disaster-recovery-acceptance-tests
+    file: disaster-recovery-acceptance-tests/ci/drats-with-integration-config/task.yml
+    privileged: true
+    params:
+      CONFIG_FILE_PATH: drats_integration_config.json
+      DEFAULT_TIMEOUT_MINS: 90
+
 
 # - name: batman-drats
 #   serial_groups: [batman]
