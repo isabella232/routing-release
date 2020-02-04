@@ -684,7 +684,12 @@ jobs:
     file: cf-deployment-concourse-tasks/run-cats/task.yml
     params:
       CONFIG_FILE_PATH: cats_integration_config.json
-
+  - task: release-pooled-environment
+    file: routing-release-ci/ci/tasks/unclaim-cf-deployment-environment/task.yml
+    tags:
+    - vsphere-cf-networking
+    params:
+      TOOLSMITHS_API_TOKEN: 9721e931-4f01-401f-ab7b-a46bf78a6054
 
 - name: batman-cf-smoke-and-indicator-protocol-tests
   plan:
