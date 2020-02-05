@@ -5,5 +5,5 @@ ENVIRONMENT_NAME="$(cat cf-environment/name)"
 
 URL="https://environments.toolsmiths.cf-app.com/pooled_gcp_engineering_environments/unclaim?api_token=${TOOLSMITHS_API_TOKEN}&name=${ENVIRONMENT_NAME}"
 
-curl -X POST ${URL}
+curl -v -X POST ${URL}
 
