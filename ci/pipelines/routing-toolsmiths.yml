@@ -658,9 +658,6 @@ jobs:
     params:
       MANIFEST_FILE: manifest.yml
       OPS_FILES: |
-        test/add-persistent-isolation-segment-diego-cell.yml
-        test/add-persistent-isolation-segment-router.yml
-        add-persistent-isolation-segment-router-ca-certs.yml
         add-lb-ca-cert.yml
         use-compiled-releases.yml
         scale_for_cats.yml
