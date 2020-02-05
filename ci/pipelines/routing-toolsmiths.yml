@@ -839,6 +839,12 @@ jobs:
     params:
       CONFIG_FILE_PATH: drats_integration_config.json
       DEFAULT_TIMEOUT_MINS: 90
+  - task: release-pooled-environment
+    file: routing-release-ci/ci/tasks/unclaim-cf-deployment-environment/task.yml
+    tags:
+    - vsphere-cf-networking
+    params:
+      TOOLSMITHS_API_TOKEN: 9721e931-4f01-401f-ab7b-a46bf78a6054
 
 
 # - name: batman-drats
@@ -984,6 +990,12 @@ jobs:
         CONFIG_FILE_PATH: rats_integration_config.json
         GINKGO_ARGS: "-v"
     file: routing-release-ci/ci/tasks/run-rats/task.yml
+  - task: release-pooled-environment
+    file: routing-release-ci/ci/tasks/unclaim-cf-deployment-environment/task.yml
+    tags:
+    - vsphere-cf-networking
+    params:
+      TOOLSMITHS_API_TOKEN: 9721e931-4f01-401f-ab7b-a46bf78a6054
 
 
 - name: batman-syslog-test
