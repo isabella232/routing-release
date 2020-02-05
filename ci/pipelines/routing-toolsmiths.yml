@@ -13,6 +13,7 @@ groups:
   - batman-drats
   - cf-deployment-cats
   - cf-deployment-drats
+  - cf-deployment-rats
   - orinoco-http-perf-tests
   - diana-tcp-perf-tests
   - ci-lite-deploy-cf
@@ -910,6 +911,80 @@ jobs:
         CONFIG_FILE_PATH: rats_integration_config.json
         GINKGO_ARGS: "-v"
       file: routing-release-ci/ci/tasks/run-rats/task.yml
+
+- name: cf-deployment-rats
+  plan:
+  - timeout: 4h
+    do:
+    - in_parallel:
+      - get: routing-release-ci
+        params: {submodules: none}
+      - get: deployments-routing
+      - get: cf-deployment
+      - get: routing-release
+        trigger: true
+      - get: cf-deployment-concourse-tasks
+  - task: claim-cf-deployment-environment
+    file: routing-release-ci/ci/tasks/claim-cf-deployment-environment/task.yml
+    tags:
+    - vsphere-cf-networking
+    params:
+      ENVIRONMENT_TYPE: cf-deployment
+      ENVIRONMENT_NOTES: cf-deployment-cats
+      TOOLSMITHS_API_TOKEN: 9721e931-4f01-401f-ab7b-a46bf78a6054
+      ENVIRONMENT_NAME: shinyshamrock
+  - task: merge-ops-files
+    file: routing-release-ci/ci/tasks/merge-ops-files/task.yml
+    input_mapping:
+      source1: smoke-tests-ops-file
+    params:
+      ENVIRONMENT: batman
+      SOURCE1_DIR: ''
+  - task: fetch-our-envs-manifest
+    file: routing-release-ci/ci/tasks/fetch-toolsmiths-manifest/task.yml
+    input_mapping:
+      toolsmiths-metadata-dir: cf-environment
+
+# - task: deploy-batman-with-created-routing
+#     file: cf-deployment-concourse-tasks/bosh-deploy-with-created-release/task.yml
+#     input_mapping:
+#       toolsmiths-env: cf-environment
+#       release: routing-release
+#       ops-files: merged-operations
+#       vars-files: routing-release
+#       cf-deployment: our-envs-manifest
+#     params:
+#       MANIFEST_FILE: manifest.yml
+#       OPS_FILES: |
+#         use-compiled-releases.yml
+#         test/add-persistent-isolation-segment-diego-cell.yml
+#         test/add-persistent-isolation-segment-router.yml
+#         add-persistent-isolation-segment-router-ca-certs.yml
+
+  - task: create-integration-config
+    file: routing-release-ci/ci/tasks/create-integration-configs/task.yml
+    input_mapping:
+        toolsmiths-metadata-dir: cf-environment
+        nullll: deployments-routing
+        deployments-routing: nullll
+    params:
+        ISO_SEG_NAME: "persistent_isolation_segment"
+  - task: update-integration-configs
+    file: cf-deployment-concourse-tasks/update-integration-configs/task.yml
+    input_mapping:
+        toolsmiths-env: cf-environment
+        integration-configs: created-integration-configs
+    params:
+        RATS_INTEGRATION_CONFIG_FILE: rats_integration_config.json
+        GIT_COMMIT_EMAIL: cf-routing-eng@pivotal.io
+  - task: run-rats
+    input_mapping:
+        integration-config: updated-integration-configs
+    params:
+        CONFIG_FILE_PATH: rats_integration_config.json
+        GINKGO_ARGS: "-v"
+    file: routing-release-ci/ci/tasks/run-rats/task.yml
+
 
 - name: batman-syslog-test
   serial_groups: [batman]
