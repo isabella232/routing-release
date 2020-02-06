@@ -6,7 +6,6 @@ groups:
   - upgrade-cf-cli-in-routing-release
   - upgrade-dep-dependencies-in-routing-perf-release
   - routing-release-unit
-  - batman-syslog-test
   - batman-cf-smoke-and-indicator-protocol-tests
   - batman-rats
   - batman-cats
@@ -14,6 +13,7 @@ groups:
   - cf-deployment-cats
   - cf-deployment-drats
   - cf-deployment-rats
+  - cf-deployment-syslog-test
   - orinoco-http-perf-tests
   - diana-tcp-perf-tests
   - ci-lite-deploy-cf
@@ -997,25 +997,58 @@ jobs:
       TOOLSMITHS_API_TOKEN: 9721e931-4f01-401f-ab7b-a46bf78a6054
 
 
-- name: batman-syslog-test
-  serial_groups: [batman]
+- name: cf-deployment-syslog-test
   plan:
   - in_parallel:
-    - get: cf-deployment-env
-      tags:
-      - vsphere-cf-networking
     - get: routing-release
-      passed: [batman-deploy-cf-using-toolsmith-base]
       trigger: true
     - get: routing-release-ci
       params: {submodules: none}
     - get: cf-deployment
-      passed: [batman-deploy-cf-using-toolsmith-base]
-      trigger: true
+    - get: deployments-routing
+    - get: cf-deployment-concourse-tasks
+  - task: claim-cf-deployment-environment
+    file: routing-release-ci/ci/tasks/claim-cf-deployment-environment/task.yml
+    tags:
+    - vsphere-cf-networking
+    params:
+      ENVIRONMENT_TYPE: cf-deployment
+      ENVIRONMENT_NOTES: cf-deployment-syslog-test
+      TOOLSMITHS_API_TOKEN: 9721e931-4f01-401f-ab7b-a46bf78a6054
+  - task: merge-ops-files
+    file: routing-release-ci/ci/tasks/merge-ops-files/task.yml
+    input_mapping:
+      source1: smoke-tests-ops-file
+    params:
+      ENVIRONMENT: batman
+      SOURCE1_DIR: ''
+  - task: fetch-our-envs-manifest
+    file: routing-release-ci/ci/tasks/fetch-toolsmiths-manifest/task.yml
+    input_mapping:
+      toolsmiths-metadata-dir: cf-environment
+  - task: deploy-batman-with-created-routing
+    file: cf-deployment-concourse-tasks/bosh-deploy-with-created-release/task.yml
+    input_mapping:
+      toolsmiths-env: cf-environment
+      release: routing-release
+      ops-files: merged-operations
+      vars-files: routing-release
+      cf-deployment: our-envs-manifest
+    params:
+      MANIFEST_FILE: manifest.yml
+      OPS_FILES: |
+        use-compiled-releases.yml
+        syslog.yml
   - task: syslog-test
     file: routing-release-ci/ci/tasks/syslog-test/task.yml
     input_mapping:
       toolsmiths-metadata-dir: cf-deployment-env
+  - task: release-pooled-environment
+    file: routing-release-ci/ci/tasks/unclaim-cf-deployment-environment/task.yml
+    tags:
+    - vsphere-cf-networking
+    params:
+      TOOLSMITHS_API_TOKEN: 9721e931-4f01-401f-ab7b-a46bf78a6054
 
 - name: orinoco-http-perf-tests
   serial: true
@@ -1765,7 +1798,6 @@ jobs:
       - batman-cats
       - batman-rats
       - batman-drats
-      - batman-syslog-test
       - ci-lite-rats
       - ci-lite-cats
       - diana-tcp-perf-tests
@@ -1784,7 +1816,6 @@ jobs:
       - batman-cats
       - batman-rats
       - batman-drats
-      - batman-syslog-test
       - ci-lite-rats
       - ci-lite-cats
       - diana-tcp-perf-tests
