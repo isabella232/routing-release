@@ -536,7 +536,7 @@ jobs:
     file: routing-release-ci/ci/tasks/fetch-toolsmiths-manifest/task.yml
     input_mapping:
       toolsmiths-metadata-dir: cf-deployment-env
-  - task: deploy-batman-with-created-routing
+  - task: redeploy-routing-release
     file: cf-deployment-concourse-tasks/bosh-deploy-with-created-release/task.yml
     input_mapping:
       toolsmiths-env: cf-deployment-env
@@ -648,7 +648,7 @@ jobs:
     file: routing-release-ci/ci/tasks/fetch-toolsmiths-manifest/task.yml
     input_mapping:
       toolsmiths-metadata-dir: cf-environment
-  - task: deploy-batman-with-created-routing
+  - task: redeploy-routing-release
     file: cf-deployment-concourse-tasks/bosh-deploy-with-created-release/task.yml
     input_mapping:
       toolsmiths-env: cf-environment
@@ -717,7 +717,7 @@ jobs:
     file: routing-release-ci/ci/tasks/fetch-toolsmiths-manifest/task.yml
     input_mapping:
       toolsmiths-metadata-dir: cf-deployment-env
-  - task: deploy-batman-with-created-routing
+  - task: redeploy-routing-release
     file: cf-deployment-concourse-tasks/bosh-deploy-with-created-release/task.yml
     input_mapping:
       toolsmiths-env: cf-deployment-env
@@ -816,7 +816,7 @@ jobs:
     file: routing-release-ci/ci/tasks/fetch-toolsmiths-manifest/task.yml
     input_mapping:
       toolsmiths-metadata-dir: cf-environment
-  - task: deploy-batman-with-created-routing
+  - task: redeploy-routing-release
     file: cf-deployment-concourse-tasks/bosh-deploy-with-created-release/task.yml
     input_mapping:
       toolsmiths-env: cf-environment
@@ -950,7 +950,7 @@ jobs:
     input_mapping:
       toolsmiths-metadata-dir: cf-environment
 
-  - task: deploy-batman-with-created-routing
+  - task: redeploy-routing-release
     file: cf-deployment-concourse-tasks/bosh-deploy-with-created-release/task.yml
     input_mapping:
       toolsmiths-env: cf-environment
@@ -1026,7 +1026,7 @@ jobs:
     file: routing-release-ci/ci/tasks/fetch-toolsmiths-manifest/task.yml
     input_mapping:
       toolsmiths-metadata-dir: cf-environment
-  - task: deploy-batman-with-created-routing
+  - task: redeploy-routing-release
     file: cf-deployment-concourse-tasks/bosh-deploy-with-created-release/task.yml
     input_mapping:
       toolsmiths-env: cf-environment
