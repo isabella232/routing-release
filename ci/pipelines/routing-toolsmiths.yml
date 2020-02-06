@@ -803,7 +803,7 @@ jobs:
     - vsphere-cf-networking
     params:
       ENVIRONMENT_TYPE: cf-deployment
-      ENVIRONMENT_NOTES: cf-deployment-cats
+      ENVIRONMENT_NOTES: cf-deployment-drats
       TOOLSMITHS_API_TOKEN: 9721e931-4f01-401f-ab7b-a46bf78a6054
   - task: merge-ops-files
     file: routing-release-ci/ci/tasks/merge-ops-files/task.yml
@@ -936,7 +936,7 @@ jobs:
     - vsphere-cf-networking
     params:
       ENVIRONMENT_TYPE: cf-deployment
-      ENVIRONMENT_NOTES: cf-deployment-cats
+      ENVIRONMENT_NOTES: cf-deployment-rats
       TOOLSMITHS_API_TOKEN: 9721e931-4f01-401f-ab7b-a46bf78a6054
   - task: merge-ops-files
     file: routing-release-ci/ci/tasks/merge-ops-files/task.yml
