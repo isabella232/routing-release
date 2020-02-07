@@ -5,6 +5,7 @@ groups:
   - cf-deployment-drats
   - cf-deployment-rats
   - cf-deployment-syslog-test
+  - cf-deployment-smoke-and-indicator-protocol-tests
   - claim-cf-deployment
   - manual-unclaim-cf-deployment
 
@@ -41,6 +42,13 @@ resources:
     user: cloudfoundry-incubator
     repository: bosh-backup-and-restore
     access_token: ((github_access_token))
+
+- name: cf-smoke-tests-release
+  type: git
+  icon: github-box
+  source:
+    branch: master
+    uri: https://github.com/cloudfoundry/cf-smoke-tests-release.git
 
 #REPOS
 - name: deployments-routing
@@ -415,3 +423,76 @@ jobs:
     - vsphere-cf-networking
     params:
       TOOLSMITHS_API_TOKEN: 9721e931-4f01-401f-ab7b-a46bf78a6054
+
+- name: cf-deployment-smoke-and-indicator-protocol-tests
+  plan:
+  - in_parallel:
+    - get: routing-release
+      trigger: true
+    - get: routing-release-ci
+      params: {submodules: none}
+    - get: cf-deployment-concourse-tasks
+    - get: deployments-routing
+    - get: cf-smoke-tests-release
+    - get: cf-deployment
+    - get: indicator-protocol-release
+      params:
+        globs:
+        - indicator-verification-linux64*
+  - task: claim-cf-deployment-environment
+    file: routing-release-ci/ci/tasks/claim-cf-deployment-environment/task.yml
+    tags:
+    - vsphere-cf-networking
+    params:
+      ENVIRONMENT_TYPE: cf-deployment
+      ENVIRONMENT_NOTES: cf-deployment-smoke-tests
+      TOOLSMITHS_API_TOKEN: 9721e931-4f01-401f-ab7b-a46bf78a6054
+  - task: fetch-our-envs-manifest
+    file: routing-release-ci/ci/tasks/fetch-toolsmiths-manifest/task.yml
+    input_mapping:
+      toolsmiths-metadata-dir: cf-environment
+  - task: update-smoke-test-ops-file
+    file: routing-release-ci/ci/tasks/update-smoke-tests-ops-file/task.yml
+    input_mapping:
+      env-name: cf-deployment-env
+  - task: merge-ops-files
+    file: routing-release-ci/ci/tasks/merge-ops-files/task.yml
+    input_mapping:
+      source1: smoke-tests-ops-file
+    params:
+      ENVIRONMENT: batman
+      SOURCE1_DIR: ''
+  - task: redeploy-routing-release
+    file: cf-deployment-concourse-tasks/bosh-deploy-with-created-release/task.yml
+    input_mapping:
+      toolsmiths-env: cf-environment
+      release: routing-release
+      ops-files: merged-operations
+      vars-files: deployments-routing
+      cf-deployment: our-envs-manifest
+    params:
+      MANIFEST_FILE: manifest.yml
+      OPS_FILES: |
+        smoke_tests.yml
+        use-compiled-releases.yml
+  - task: create-integration-config
+    file: routing-release-ci/ci/tasks/create-integration-configs/task.yml
+    input_mapping:
+      toolsmiths-metadata-dir: cf-environment
+    params:
+      ISO_SEG_NAME: "persistent_isolation_segment"
+  - task: update-integration-configs
+    file: cf-deployment-concourse-tasks/update-integration-configs/task.yml
+    input_mapping:
+      toolsmiths-env: cf-environment
+      integration-configs: created-integration-configs
+    params:
+      CATS_INTEGRATION_CONFIG_FILE: cats_integration_config.json
+      GIT_COMMIT_EMAIL: cf-routing-eng@pivotal.io
+  - task: run-cf-smoke-tests
+    file: cf-deployment-concourse-tasks/run-errand/task.yml
+    input_mapping:
+      toolsmiths-env: cf-environment
+    params:
+      DEPLOYMENT_NAME: cf
+      ERRAND_NAME: smoke-tests
