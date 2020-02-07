@@ -50,6 +50,15 @@ resources:
     branch: master
     uri: https://github.com/cloudfoundry/cf-smoke-tests-release.git
 
+- name: indicator-protocol-release
+  type: github-release
+  icon: github-face
+  source:
+    user: pivotal
+    repository: monitoring-indicator-protocol
+    access_token: ((github_access_token))
+    tag_filter: "v?(0.8\\..*)"
+
 #REPOS
 - name: deployments-routing
   type: git
@@ -454,7 +463,7 @@ jobs:
   - task: update-smoke-test-ops-file
     file: routing-release-ci/ci/tasks/update-smoke-tests-ops-file/task.yml
     input_mapping:
-      env-name: cf-deployment-env
+      env-name: cf-environment
   - task: merge-ops-files
     file: routing-release-ci/ci/tasks/merge-ops-files/task.yml
     input_mapping:
