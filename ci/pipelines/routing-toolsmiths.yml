@@ -122,23 +122,23 @@ jobs:
 - name: cf-deployment-cats
   plan:
   - in_parallel:
-    - get: routing-release-ci
-      params: {submodules: none}
+    - do:
+      - get: routing-release-ci
+        params: {submodules: none}
+      - task: claim-cf-deployment-environment
+        file: routing-release-ci/ci/tasks/claim-cf-deployment-environment/task.yml
+        tags:
+        - vsphere-cf-networking
+        params:
+          ENVIRONMENT_TYPE: cf-deployment
+          ENVIRONMENT_NOTES: cf-deployment-cats
+          TOOLSMITHS_API_TOKEN: 9721e931-4f01-401f-ab7b-a46bf78a6054
     - get: cf-acceptance-tests
     - get: deployments-routing
     - get: cf-deployment
     - get: cf-deployment-concourse-tasks
     - get: routing-release
       trigger: true
-  - task: claim-cf-deployment-environment
-    file: routing-release-ci/ci/tasks/claim-cf-deployment-environment/task.yml
-    tags:
-    - vsphere-cf-networking
-    params:
-      ENVIRONMENT_TYPE: cf-deployment
-      ENVIRONMENT_NOTES: cf-deployment-cats
-      TOOLSMITHS_API_TOKEN: 9721e931-4f01-401f-ab7b-a46bf78a6054
-# ENVIRONMENT_NAME: verypaleorange
   - task: write-lb-cert-to-credhub
     input_mapping:
       toolsmiths-metadata-dir: cf-environment
