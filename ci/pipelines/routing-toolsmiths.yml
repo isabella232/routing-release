@@ -72,11 +72,18 @@ resources:
   type: git
   icon: github-box
   source:
-    branch: toolsmith-env-conversion-wip
+    branch: develop
     uri: git@github.com:cloudfoundry/routing-release.git
     private_key: ((github_private_key.private_key))
     paths:
       - ci
+
+- name: networking-oss-tools
+  type: git
+  icon: github-box
+  source:
+    branch: master
+    uri: https://github.com/cloudfoundry/networking-oss-tools.git
 
 # CF Deployment
 - name: cf-deployment
@@ -151,6 +158,7 @@ jobs:
           ENVIRONMENT_NOTES: cf-deployment-cats
           TOOLSMITHS_API_TOKEN: 9721e931-4f01-401f-ab7b-a46bf78a6054
     - get: cf-acceptance-tests
+    - get: networking-oss-tools
     - get: deployments-routing
     - get: cf-deployment
     - get: cf-deployment-concourse-tasks
@@ -224,6 +232,7 @@ jobs:
     - get: cf-deployment
     - get: deployments-routing
     - get: cf-deployment-concourse-tasks
+    - get: networking-oss-tools
   - task: claim-cf-deployment-environment
     file: routing-release-ci/ci/tasks/claim-cf-deployment-environment/task.yml
     tags:
@@ -309,6 +318,7 @@ jobs:
         params: {submodules: none}
       - get: deployments-routing
       - get: cf-deployment
+      - get: networking-oss-tools
       - get: routing-release
         trigger: true
       - get: cf-deployment-concourse-tasks
@@ -388,6 +398,7 @@ jobs:
       params: {submodules: none}
     - get: cf-deployment
     - get: deployments-routing
+    - get: networking-oss-tools
     - get: cf-deployment-concourse-tasks
   - task: claim-cf-deployment-environment
     file: routing-release-ci/ci/tasks/claim-cf-deployment-environment/task.yml
@@ -442,6 +453,7 @@ jobs:
       params: {submodules: none}
     - get: cf-deployment-concourse-tasks
     - get: deployments-routing
+    - get: networking-oss-tools
     - get: cf-smoke-tests-release
     - get: cf-deployment
     - get: indicator-protocol-release
