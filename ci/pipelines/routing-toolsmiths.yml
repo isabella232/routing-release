@@ -60,14 +60,6 @@ resources:
     tag_filter: "v?(0.8\\..*)"
 
 #REPOS
-- name: deployments-routing
-  type: git
-  icon: github-box
-  source:
-    branch: master
-    private_key: ((github_private_key.private_key))
-    uri: git@github.com:cloudfoundry/deployments-routing.git
-
 - name: routing-release-ci
   type: git
   icon: github-box
@@ -159,7 +151,6 @@ jobs:
           TOOLSMITHS_API_TOKEN: 9721e931-4f01-401f-ab7b-a46bf78a6054
     - get: cf-acceptance-tests
     - get: networking-oss-tools
-    - get: deployments-routing
     - get: cf-deployment
     - get: cf-deployment-concourse-tasks
     - get: routing-release
@@ -230,7 +221,6 @@ jobs:
     - get: bbr-binary-release
     - get: disaster-recovery-acceptance-tests
     - get: cf-deployment
-    - get: deployments-routing
     - get: cf-deployment-concourse-tasks
     - get: networking-oss-tools
   - task: claim-cf-deployment-environment
@@ -282,33 +272,6 @@ jobs:
     params:
       TOOLSMITHS_API_TOKEN: 9721e931-4f01-401f-ab7b-a46bf78a6054
 
-
-# - name: batman-drats
-#   serial_groups: [batman]
-#   plan:
-#   - get: routing-release
-#     passed: [batman-deploy-cf]
-#     trigger: true
-#   - get: routing-release-ci
-#   - get: deployments-routing
-#   - get: bbr-binary-release
-#   - get: disaster-recovery-acceptance-tests
-#   - get: cf-deployment
-#     trigger: true
-#     passed: [batman-cf-smoke-and-indicator-protocol-tests]
-#   - task: create-drats-config
-#     file: routing-release-ci/ci/tasks/create-drats-config/task.yml
-#     params:
-#       ENVIRONMENT: batman
-#   - task: run-disaster-recovery-acceptance-tests
-#     file: disaster-recovery-acceptance-tests/ci/drats-with-integration-config/task.yml
-#     input_mapping:
-#       drats-integration-config: created-drats-config
-#     privileged: true
-#     params:
-#       CONFIG_FILE_PATH: batman/drats_integration_config.json
-#       DEFAULT_TIMEOUT_MINS: 90
-
 - name: cf-deployment-rats
   plan:
   - timeout: 4h
@@ -316,7 +279,6 @@ jobs:
     - in_parallel:
       - get: routing-release-ci
         params: {submodules: none}
-      - get: deployments-routing
       - get: cf-deployment
       - get: networking-oss-tools
       - get: routing-release
@@ -362,8 +324,6 @@ jobs:
     file: routing-release-ci/ci/tasks/create-integration-configs/task.yml
     input_mapping:
         toolsmiths-metadata-dir: cf-environment
-        nullll: deployments-routing
-        deployments-routing: nullll
     params:
         ISO_SEG_NAME: "persistent_isolation_segment"
   - task: update-integration-configs
@@ -397,7 +357,6 @@ jobs:
     - get: routing-release-ci
       params: {submodules: none}
     - get: cf-deployment
-    - get: deployments-routing
     - get: networking-oss-tools
     - get: cf-deployment-concourse-tasks
   - task: claim-cf-deployment-environment
@@ -436,7 +395,6 @@ jobs:
     file: routing-release-ci/ci/tasks/syslog-test/task.yml
     input_mapping:
       toolsmiths-metadata-dir: cf-environment
-      deployments-routing: null
   - task: release-pooled-environment
     file: routing-release-ci/ci/tasks/unclaim-cf-deployment-environment/task.yml
     tags:
@@ -452,7 +410,6 @@ jobs:
     - get: routing-release-ci
       params: {submodules: none}
     - get: cf-deployment-concourse-tasks
-    - get: deployments-routing
     - get: networking-oss-tools
     - get: cf-smoke-tests-release
     - get: cf-deployment
@@ -489,7 +446,7 @@ jobs:
       toolsmiths-env: cf-environment
       release: routing-release
       ops-files: merged-operations
-      vars-files: deployments-routing
+      vars-files: null
       cf-deployment: our-envs-manifest
     params:
       MANIFEST_FILE: manifest.yml
