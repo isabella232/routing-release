@@ -77,8 +77,6 @@ resources:
     branch: master
     uri: git@github.com:cloudfoundry/networking-oss-deployments.git
     private_key: ((github_private_key.private_key))
-    paths:
-      - ci
 
 # CF Deployment
 - name: cf-deployment
