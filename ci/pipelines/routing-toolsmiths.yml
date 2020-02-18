@@ -185,7 +185,7 @@ jobs:
       OPS_FILES: |
         add-lb-ca-cert.yml
         use-compiled-releases.yml
-        scale_for_cats.yml
+        scale-for-cats.yml
   - task: create-integration-config
     file: routing-release-ci/ci/tasks/create-integration-configs/task.yml
     input_mapping:
@@ -457,7 +457,7 @@ jobs:
     params:
       MANIFEST_FILE: manifest.yml
       OPS_FILES: |
-        smoke_tests.yml
+        smoke-tests.yml
         use-compiled-releases.yml
         test/add-persistent-isolation-segment-diego-cell.yml
         test/add-persistent-isolation-segment-router.yml
