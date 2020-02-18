@@ -436,7 +436,7 @@ jobs:
     input_mapping:
       toolsmiths-metadata-dir: cf-environment
   - task: update-smoke-test-ops-file
-    file: routing-release-ci/ci/tasks/update-smoke-tests-ops-file/task.yml
+    file: routing-release-ci/ci/tasks/update-smoke-tests-ops-file-for-toolsmiths/task.yml
     input_mapping:
       env-name: cf-environment
   - task: merge-ops-files
