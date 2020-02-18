@@ -4,8 +4,7 @@ set -euo pipefail
 
 PIPELINE_DIR="$(dirname $0)/pipelines"
 
-: "${1?"Usage: update <pipeline-name>"}"
-PIPELINE_NAME=$1
+PIPELINE_NAME=routing-toolsmiths
 
 fly -t ga sync
 
