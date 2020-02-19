@@ -452,7 +452,7 @@ jobs:
       toolsmiths-env: cf-environment
       release: routing-release
       ops-files: merged-operations
-      vars-files: null
+      vars-files: routing-release
       cf-deployment: our-envs-manifest
     params:
       MANIFEST_FILE: manifest.yml
