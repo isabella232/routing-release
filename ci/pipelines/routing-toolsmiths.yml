@@ -150,7 +150,7 @@ jobs:
           ENVIRONMENT_TYPE: cf-deployment
 #           ENVIRONMENT_NOTES: cf-deployment-cats
           ENVIRONMENT_NOTES: bruce-test
-          TOOLSMITHS_API_TOKEN: 9721e931-4f01-401f-ab7b-a46bf78a6054
+          TOOLSMITHS_API_TOKEN: ((toolsmiths_api_key))
     - get: cf-acceptance-tests
     - get: networking-oss-deployments
     - get: cf-deployment
@@ -211,7 +211,7 @@ jobs:
     tags:
     - vsphere-cf-networking
     params:
-      TOOLSMITHS_API_TOKEN: 9721e931-4f01-401f-ab7b-a46bf78a6054
+      TOOLSMITHS_API_TOKEN: ((toolsmiths_api_key))
 
 - name: cf-deployment-drats
   plan:
@@ -233,7 +233,7 @@ jobs:
       ENVIRONMENT_TYPE: cf-deployment
 #       ENVIRONMENT_NOTES: cf-deployment-drats
       ENVIRONMENT_NOTES: bruce-test
-      TOOLSMITHS_API_TOKEN: 9721e931-4f01-401f-ab7b-a46bf78a6054
+      TOOLSMITHS_API_TOKEN: ((toolsmiths_api_key))
   - task: merge-ops-files
     file: routing-release-ci/ci/tasks/merge-ops-files/task.yml
     input_mapping:
@@ -273,7 +273,7 @@ jobs:
     tags:
     - vsphere-cf-networking
     params:
-      TOOLSMITHS_API_TOKEN: 9721e931-4f01-401f-ab7b-a46bf78a6054
+      TOOLSMITHS_API_TOKEN: ((toolsmiths_api_key))
 
 - name: cf-deployment-rats
   plan:
@@ -295,7 +295,7 @@ jobs:
       ENVIRONMENT_TYPE: cf-deployment
 #       ENVIRONMENT_NOTES: cf-deployment-rats
       ENVIRONMENT_NOTES: bruce-test
-      TOOLSMITHS_API_TOKEN: 9721e931-4f01-401f-ab7b-a46bf78a6054
+      TOOLSMITHS_API_TOKEN: ((toolsmiths_api_key))
   - task: merge-ops-files
     file: routing-release-ci/ci/tasks/merge-ops-files/task.yml
     input_mapping:
@@ -350,7 +350,7 @@ jobs:
     tags:
     - vsphere-cf-networking
     params:
-      TOOLSMITHS_API_TOKEN: 9721e931-4f01-401f-ab7b-a46bf78a6054
+      TOOLSMITHS_API_TOKEN: ((toolsmiths_api_key))
 
 
 - name: cf-deployment-syslog-test
@@ -371,7 +371,7 @@ jobs:
       ENVIRONMENT_TYPE: cf-deployment
 #       ENVIRONMENT_NOTES: cf-deployment-syslog-test
       ENVIRONMENT_NOTES: bruce-test
-      TOOLSMITHS_API_TOKEN: 9721e931-4f01-401f-ab7b-a46bf78a6054
+      TOOLSMITHS_API_TOKEN: ((toolsmiths_api_key))
   - task: merge-ops-files
     file: routing-release-ci/ci/tasks/merge-ops-files/task.yml
     input_mapping:
@@ -405,7 +405,7 @@ jobs:
     tags:
     - vsphere-cf-networking
     params:
-      TOOLSMITHS_API_TOKEN: 9721e931-4f01-401f-ab7b-a46bf78a6054
+      TOOLSMITHS_API_TOKEN: ((toolsmiths_api_key))
 
 - name: cf-deployment-smoke-and-indicator-protocol-tests
   plan:
@@ -430,7 +430,7 @@ jobs:
       ENVIRONMENT_TYPE: cf-deployment
 #       ENVIRONMENT_NOTES: cf-deployment-smoke-tests
       ENVIRONMENT_NOTES: bruce-test
-      TOOLSMITHS_API_TOKEN: 9721e931-4f01-401f-ab7b-a46bf78a6054
+      TOOLSMITHS_API_TOKEN: ((toolsmiths_api_key))
   - task: fetch-our-envs-manifest
     file: routing-release-ci/ci/tasks/fetch-toolsmiths-manifest/task.yml
     input_mapping:
@@ -489,4 +489,4 @@ jobs:
     tags:
     - vsphere-cf-networking
     params:
-      TOOLSMITHS_API_TOKEN: 9721e931-4f01-401f-ab7b-a46bf78a6054
+      TOOLSMITHS_API_TOKEN: ((toolsmiths_api_key))
