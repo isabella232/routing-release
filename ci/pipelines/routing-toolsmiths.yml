@@ -1,6 +1,7 @@
 groups:
 - name: routing-release-ci
   jobs:
+  - create-acceptance-environment
   - cf-deployment-cats
   - cf-deployment-drats
   - cf-deployment-rats
@@ -135,6 +136,54 @@ jobs:
         env_file: cf-deployment-env/metadata
       tags:
         - vsphere-cf-networking
+
+- name: create-acceptance-environment
+  plan:
+  - in_parallel:
+    - do:
+      - get: routing-release-ci
+        params: {submodules: none}
+      - task: claim-cf-deployment-environment
+        file: routing-release-ci/ci/tasks/claim-cf-deployment-environment/task.yml
+        tags:
+        - vsphere-cf-networking
+        params:
+          ENVIRONMENT_TYPE: cf-deployment
+#           ENVIRONMENT_NOTES: cf-deployment-cats
+          ENVIRONMENT_NOTES: acceptance-environment
+          TOOLSMITHS_API_TOKEN: ((toolsmiths_api_key))
+    - get: networking-oss-deployments
+    - get: cf-deployment
+    - get: cf-deployment-concourse-tasks
+    - get: routing-release
+  - task: write-lb-cert-to-credhub
+    input_mapping:
+      toolsmiths-metadata-dir: cf-environment
+    file: routing-release-ci/ci/tasks/write-lb-cert-to-credhub/task.yml
+  - task: merge-ops-files
+    file: routing-release-ci/ci/tasks/merge-ops-files/task.yml
+    input_mapping:
+      source1: smoke-tests-ops-file
+    params:
+      ENVIRONMENT: this-doesnt-do-anything
+      SOURCE1_DIR: ''
+  - task: fetch-our-envs-manifest
+    file: routing-release-ci/ci/tasks/fetch-toolsmiths-manifest/task.yml
+    input_mapping:
+      toolsmiths-metadata-dir: cf-environment
+  - task: redeploy-routing-release
+    file: cf-deployment-concourse-tasks/bosh-deploy-with-created-release/task.yml
+    input_mapping:
+      toolsmiths-env: cf-environment
+      release: routing-release
+      ops-files: merged-operations
+      vars-files: routing-release
+      cf-deployment: our-envs-manifest
+    params:
+      MANIFEST_FILE: manifest.yml
+      OPS_FILES: |
+        add-lb-ca-cert.yml
+        use-compiled-releases.yml
 
 - name: cf-deployment-cats
   plan:
